@@ -1,0 +1,11 @@
+/.phpcs-cache
+/.phpunit.result.cache
+/clover.xml
+/coveralls-upload.json
+/phpunit.xml
+/vendor/
+composer.lock
+.idea
+.env
+log/app.log
+

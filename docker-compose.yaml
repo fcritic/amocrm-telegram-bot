@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+    # PHP fpm
+    application-backend:
+        image: application-backend:latest
+        restart: always
+        tty: true
+        working_dir: /var/www/application
+        env_file:
+            - .env
+        volumes:
+            - .:/var/www/application
+        container_name: application-backend
+
+    # Nginx Service
+    application-nginx:
+        image: nginx:alpine
+        container_name: application-nginx
+        restart: always
+        tty: true
+        environment:
+            - "APPLICATION_UPSTREAM=application-backend:9000"
+        volumes:
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+            - ./docker/nginx/templates/:/etc/nginx/templates/
+            - ./public/:/var/www/application/public/
+        ports:
+            - "9000:9000"
+            - "443:443"
+
+    # MySQL Service
+    application-mysql:
+        image: library/mysql:8.0
+        container_name: application-mysql
+        restart: always
+        tty: true
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: app_db
+            MYSQL_USER: admin
+            MYSQL_PASSWORD: 111111
+            MYSQL_ROOT_PASSWORD: admin
+            SERVICE_NAME: mysql
+        volumes:
+            - applicationMysqlData:/var/lib/mysql
+            - applicationMysqlFiles:/var/lib/mysql-files
+
+    # Queue Service
+    application-beanstalkd:
+        image: schickling/beanstalkd:latest
+        container_name: application-beanstalkd
+        ports:
+            - "11300:11300"
+
+#Docker Volumes
+volumes:
+    applicationMysqlData:
+        driver: local
+    applicationMysqlFiles:
+        driver: local
