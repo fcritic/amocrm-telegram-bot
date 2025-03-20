@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Integration\Service;
 
 use Account\Repository\Interface\AccountRepositoryInterface;
-use App\Enum\ResponseMessage;
-use App\Enum\ResponseStatus;
 use App\Exception\InvalidTokenOwnerException;
 use Chat\Repository\Interface\ConversationRepositoryInterface;
 use Chat\Repository\Interface\ExternalUserRepositoryInterface;
@@ -41,35 +39,35 @@ readonly class DatabaseService
     public function saveDataMessage(MessageDataInterface $dtoDb): void
     {
         Capsule::connection()->transaction(function () use ($dtoDb) {
-            /** @var Account $account */
-            $account = $this->accountRepo->getByIdentifier(identifier: $dtoDb->getAccountIdentifier());
 
-            if ($account === null) {
+            $accountId = $this->getByIdentifier(identifier: $dtoDb->getAccountIdentifier());
+
+            if ($accountId === null) {
                 throw new RuntimeException('Account not found');
             }
 
-            $externalUser = $this->saveExternalUser(account: $account, dtoDb: $dtoDb);
-            $user = $this->saveUser(account: $account, dtoDb: $dtoDb);
+            $externalUser = $this->saveExternalUser(accountId: $accountId, dtoDb: $dtoDb);
+            $user = $this->saveUser(accountId: $accountId, dtoDb: $dtoDb);
             $conversation = $this->saveConversation(externalUser: $externalUser, dtoDb: $dtoDb);
             $this->saveMessage(externalUser: $externalUser, user: $user, conversation: $conversation, dtoDb: $dtoDb);
         });
     }
 
-    protected function saveUser(Account $account, MessageDataInterface $dtoDb): ExternalUser
+    protected function saveUser(int $accountId, MessageDataInterface $dtoDb): ExternalUser
     {
         /** @var ExternalUser */
         return $this->externalUserRepo->firstOrCreateExternalUser(
-            accountId: $account->id,
+            accountId: $accountId,
             amocrmUid: $dtoDb->getSenderRefId(),
             name: $dtoDb->getSenderName(),
         );
     }
 
-    protected function saveExternalUser(Account $account, MessageDataInterface $dtoDb): ExternalUser
+    protected function saveExternalUser(int $accountId, MessageDataInterface $dtoDb): ExternalUser
     {
         /** @var ExternalUser */
         return $this->externalUserRepo->firstOrCreateExternalUser(
-            accountId: $account->id,
+            accountId: $accountId,
             amocrmUid: $dtoDb->getReceiverRefId(),
             telegramId: $dtoDb->getReceiverId(),
             name: $dtoDb->getReceiverName(),
@@ -140,5 +138,21 @@ readonly class DatabaseService
             botToken: $token,
             secretToken: TelegramSettingsService::generateSecretToken($token)
         );
+    }
+
+    protected function getByIdentifier(array $identifier): ?int
+    {
+        /** @var Telegram|Account $model */
+        $model = match ($identifier['type']) {
+            'account_uid'  => $this->accountRepo->getBy($identifier['type'], $identifier['value']),
+            'secret_token' => $this->telegramRepo->getBySecret($identifier['value']),
+            default        => null
+        };
+
+        return match (true) {
+            $model instanceof Account => $model->id,
+            $model instanceof Telegram => $model->account_id,
+            default => null,
+        };
     }
 }

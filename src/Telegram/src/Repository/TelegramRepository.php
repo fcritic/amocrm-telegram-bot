@@ -30,7 +30,7 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
      * @param string $secretToken Секретный ключ для хука тг бота
      * @return int
      */
-    public function updateOrCreateTelegram(int $accountId, string $botToken, string $secretToken): Model
+    public function updateOrCreateTelegram(int $accountId, string $botToken, string $secretToken): Telegram
     {
         /** @var Telegram */
         return $this->updateOrCreate(
@@ -43,16 +43,16 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
         );
     }
 
-    public function getByToken(string $token): ?Model
+    public function getByToken(string $token): ?Telegram
     {
+        /** @var Telegram */
         return $this->getBy('token_bot', $token);
     }
 
-    public function getBySecret(string $secretToken): ?string
+    public function getBySecret(string $secretToken): ?Telegram
     {
-        /** @var Telegram $telegram */
-        $telegram = $this->getBy('secret_token', $secretToken);
-        return $telegram->secret_token;
+        /** @var Telegram */
+        return $this->getBy('secret_token', $secretToken);
     }
 
     public function getAvatarBotToken(string $fileId): ?string
@@ -67,7 +67,7 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
 
     protected function getBotTokenByFileId(string $fileId, string $sourceType): ?string
     {
-        $query = $this->query()
+        $query = $this->query
             ->select('telegram.token_bot')
             ->from('telegram')
             ->join('external_user', 'telegram.account_id', '=', 'external_user.account_id');

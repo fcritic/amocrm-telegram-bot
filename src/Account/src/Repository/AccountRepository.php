@@ -8,7 +8,6 @@ use Account\Model\Account;
 use Account\Repository\Interface\AccountRepositoryInterface;
 use App\Repository\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
-use Telegram\Model\Telegram;
 
 /**
  * Репозиторий для аккаунта
@@ -37,10 +36,10 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
         $account = $this->firstOrCreate(
             ['account_id' => $accountId],
             [
-                'sub_domain' => $subDomain,
-                'account_id' => $accountId,
+                'sub_domain'  => $subDomain,
+                'account_id'  => $accountId,
                 'account_uid' => $accountUid,
-                'is_active' => true,
+                'is_active'   => true,
             ]
         );
 
@@ -51,7 +50,7 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
      * @param int $accountId
      * @return Model|null
      */
-    public function getAccountById(int $accountId): ?Model
+    public function getAccountById(int $accountId): ?Account
     {
         return $this->getBy('account_id', $accountId);
     }
@@ -62,60 +61,24 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
      */
     public function getTelegramToken(string $accountUid): ?string
     {
-        $query = $this->query()
-            ->select('telegram.token_bot as token_bot')
-            ->leftJoin('telegram', 'account.id', '=', 'telegram.account_id')
-            ->where('account.account_uid', $accountUid)
-            ->first();
-
-        return $query?->value('token_bot');
-    }
-
-    /**
-     * @param string $accountId Числовое ID аккаунта
-     * @return Model|null
-     */
-    public function getAccessToken(string $accountId): ?Model
-    {
-        return $this->query()
-            ->select('account.account_id', 'access_token.access_token')
-            ->leftJoin('access_token', 'account.id', '=', 'access_token.user_id')
-            ->where('account.account_id', $accountId)
-            ->first();
-    }
-
-    /**
-     * @param array $identifier
-     * @return Model|null
-     */
-    public function getByIdentifier(array $identifier): ?Model
-    {
-        return match ($identifier['type']) {
-            'account_uid' => $this->getBy($identifier['type'], $identifier['value']),
-            'secret' => $this->getBySecret($identifier['value']),
-            default => null
-        };
+        return $this->query
+            ->with('telegram')
+            ->where('account_uid', $accountUid)
+            ->first()
+            ?->telegram
+            ?->token_bot;
     }
 
     /**
      * @param string $subDomain
      * @return Model|null
      */
-    public function getFieldsId(string $subDomain): ?Model
+    public function getFieldsId(string $subDomain): ?Account
     {
-        return $this->query()
+        return $this->query
             ->select('access_token.id as fieldTokenId', 'account.id as fieldAccountId')
             ->leftJoin('access_token', 'access_token.account_id', '=', 'account.id')
             ->where('sub_domain', $subDomain)
-            ->first();
-    }
-
-    public function getBySecret(string $secret): ?Model
-    {
-        return $this->query()
-            ->select('*')
-            ->leftJoin('telegram', 'telegram.account_id', '=', 'account.id')
-            ->where('telegram.secret_token', $secret)
             ->first();
     }
 }
