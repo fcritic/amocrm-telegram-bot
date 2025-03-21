@@ -18,7 +18,7 @@ readonly class TelegramMessageData implements MessageDataInterface
     public function getAccountIdentifier(): array
     {
         return [
-          'type' => 'secret',
+          'type' => 'secret_token',
           'value' => $this->secret,
         ];
     }

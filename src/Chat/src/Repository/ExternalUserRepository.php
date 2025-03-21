@@ -7,7 +7,6 @@ namespace Chat\Repository;
 use Chat\Model\ExternalUser;
 use App\Repository\AbstractRepository;
 use Chat\Repository\Interface\ExternalUserRepositoryInterface;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Репозиторий для внешнего пользователя
@@ -80,7 +79,8 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
         string|null $number = null,
         string|null $avatar = null,
         string|null $profileLink = null
-    ): Model {
+    ): ExternalUser {
+        /** @var ExternalUser */
         return $this->firstOrCreate(
             ['amocrm_uid' => $amocrmUid],
             [
@@ -94,5 +94,21 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
                 'profile_link' => $profileLink,
             ]
         );
+    }
+
+    /**
+     * Получения токена тг бота по id файла на стороне интеграции
+     * @param string $avatar
+     * @return string|null
+     */
+    public function getTokenByAvatar(string $avatar): ?string
+    {
+        return $this->query
+            ->with(['account.telegram'])
+            ->where('avatar', $avatar)
+            ->first()
+            ?->account
+            ?->telegram
+            ?->token_bot;
     }
 }

@@ -45,8 +45,8 @@ class AccessTokenRepository extends AbstractRepository implements AccessTokenRep
     /**
      * Редактирование модель токена в БД
      *
-     * @param int $id
-     * @param AccessTokenInterface $accessToken Объект токена
+     * @param int $id локальный id в базе
+     * @param AccessTokenInterface $accessToken объект токена
      * @return bool
      */
     public function updateAccessToken(int $id, AccessTokenInterface $accessToken): bool

@@ -7,7 +7,6 @@ namespace Chat\Repository;
 use Chat\Model\Conversation;
 use App\Repository\AbstractRepository;
 use Chat\Repository\Interface\ConversationRepositoryInterface;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Репозиторий для чата
@@ -22,8 +21,9 @@ class ConversationRepository extends AbstractRepository implements ConversationR
         return Conversation::class;
     }
 
-    public function getConversationById(string $conversationRefId): ?Model
+    public function getConversationById(string $conversationRefId): ?Conversation
     {
+        /** @var Conversation */
         return $this->getBy('amocrm_chat_id', $conversationRefId);
     }
 
@@ -35,8 +35,9 @@ class ConversationRepository extends AbstractRepository implements ConversationR
      * @param string $amocrmChatId `ref_id`: ID на стороне API чатов AmoJoService
      * @return Conversation
      */
-    public function createConversation(int $externalUserId, int $telegramChatId, string $amocrmChatId): Model
+    public function createConversation(int $externalUserId, int $telegramChatId, string $amocrmChatId): Conversation
     {
+        /** @var Conversation */
         return $this->create([
             'external_user_id' => $externalUserId,
             'telegram_chat_id' => $telegramChatId,
@@ -54,7 +55,8 @@ class ConversationRepository extends AbstractRepository implements ConversationR
         int $externalUserId,
         int $telegramChatId,
         string $amocrmChatId
-    ): Model {
+    ): Conversation {
+        /** @var Conversation */
         return $this->updateOrCreate(
             ['external_user_id' => $externalUserId],
             [
@@ -75,7 +77,8 @@ class ConversationRepository extends AbstractRepository implements ConversationR
         int $externalUserId,
         int $telegramChatId,
         string $amocrmChatId
-    ): Model {
+    ): Conversation {
+        /** @var Conversation */
         return $this->firstOrCreate(
             ['amocrm_chat_id' => $amocrmChatId],
             [
