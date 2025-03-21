@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Account\Repository\Interface;
 
 use Account\Model\Account;
-use Illuminate\Database\Eloquent\Model;
 
 interface AccountRepositoryInterface
 {
@@ -15,5 +14,5 @@ interface AccountRepositoryInterface
 
     public function getTelegramToken(string $accountUid): ?string;
 
-    public function getFieldsId(string $subDomain): ?Account;
+    public function getFieldsId(string $subDomain): array;
 }

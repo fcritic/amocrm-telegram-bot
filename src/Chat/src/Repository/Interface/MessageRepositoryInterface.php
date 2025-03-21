@@ -18,4 +18,6 @@ interface MessageRepositoryInterface
         string|null $fileName,
         int|null $fileSize,
     ): int;
+
+    public function getTokenByMedia(string $media): ?string;
 }

@@ -64,4 +64,21 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
 
         return $message->id;
     }
+
+    /**
+     * Получения токена тг бота по id файла на стороне интеграции
+     * @param string $media
+     * @return string|null
+     */
+    public function getTokenByMedia(string $media): ?string
+    {
+        return $this->query
+            ->with(['sender.account.telegram'])
+            ->where('media', $media)
+            ->first()
+            ?->sender
+            ?->account
+            ?->telegram
+            ?->token_bot;
+    }
 }

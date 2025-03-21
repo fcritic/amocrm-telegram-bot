@@ -71,14 +71,19 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
 
     /**
      * @param string $subDomain
-     * @return Model|null
+     * @return array<string, int> возвращает локальный id моделей из таблиц
      */
-    public function getFieldsId(string $subDomain): ?Account
+    public function getFieldsId(string $subDomain): array
     {
-        return $this->query
-            ->select('access_token.id as fieldTokenId', 'account.id as fieldAccountId')
-            ->leftJoin('access_token', 'access_token.account_id', '=', 'account.id')
+        /** @var Account $account */
+        $account = $this->query
+            ->with('accessToken:id,account_id')
             ->where('sub_domain', $subDomain)
-            ->first();
+            ->first(['id']);
+
+        return [
+            'field_access_token_id' => $account?->getAttribute('accessToken')?->first()?->id,
+            'field_account_id' => $account?->id,
+        ];
     }
 }

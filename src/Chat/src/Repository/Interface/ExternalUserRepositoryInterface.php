@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Chat\Repository\Interface;
 
-use Illuminate\Database\Eloquent\Model;
+use Chat\Model\ExternalUser;
 
 interface ExternalUserRepositoryInterface
 {
@@ -28,5 +28,7 @@ interface ExternalUserRepositoryInterface
         string|null $number = null,
         string|null $avatar = null,
         string|null $profileLink = null
-    ): Model;
+    ): ExternalUser;
+
+    public function getTokenByAvatar(string $avatar): ?string;
 }
