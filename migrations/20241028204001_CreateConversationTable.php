@@ -14,14 +14,15 @@ class CreateConversationTable extends Migration
     public function up(): void
     {
         Capsule::schema()->create('conversation', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('external_user_id')->unsigned();
-            $table->string('telegram_chat_id');
-            $table->string('amocrm_chat_id');
+            $table->increments('id')->comment('Локальный идентификатор');
+            $table->unsignedInteger('external_user_id')
+                ->unsigned()
+                ->comment('Связь с внешним пользователем');
+            $table->bigInteger('telegram_chat_id')->comment('ID чата в TelegramConnection');
+            $table->uuid('amo_chat_id')->comment('UUID чата из API чатов amoCRM');
             $table->timestamps();
 
-            $table
-                ->foreign('external_user_id')
+            $table->foreign('external_user_id')
                 ->references('id')
                 ->on('external_user')
                 ->onDelete('cascade');

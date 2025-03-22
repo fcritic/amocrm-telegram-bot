@@ -14,33 +14,20 @@ class CreateMessageTable extends Migration
     public function up(): void
     {
         Capsule::schema()->create('message', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('conversation_id')->unsigned();
-            $table->string('amocrm_msg_id')->nullable();
-            $table->string('telegram_msg_id');
-            $table->integer('sender_id')->unsigned();
-            $table->integer('receiver_id')->unsigned()->nullable();
+            $table->increments('id')->comment('Локальный идентификатор');
+            $table->unsignedInteger('conversation_id')->unsigned()->comment('Связь с чатом');
+            $table->uuid('amo_message_id')->nullable()->comment('ID сообщения в amoCRM');
+            $table->bigInteger('telegram_message_id')->comment('ID сообщения в TelegramConnection');
             $table->string('type');
-            $table->text('text')->nullable();
-            $table->string('media')->nullable();
-            $table->string('file_name')->nullable();
+            $table->text('content')->charset('utf8mb4')->nullable()->comment('Текст сообщения');
+            $table->string('media',210)->nullable();
+            $table->string('file_name',210)->nullable();
             $table->integer('file_size')->nullable();
             $table->timestamps();
 
-            $table
-                ->foreign('conversation_id')
+            $table->foreign('conversation_id')
                 ->references('id')
                 ->on('conversation')
-                ->onDelete('cascade');
-            $table
-                ->foreign('sender_id')
-                ->references('id')
-                ->on('external_user')
-                ->onDelete('cascade');
-            $table
-                ->foreign('receiver_id')
-                ->references('id')
-                ->on('external_user')
                 ->onDelete('cascade');
         });
     }
@@ -52,8 +39,6 @@ class CreateMessageTable extends Migration
     {
         Capsule::schema()->table('message', function (Blueprint $table) {
             $table->dropForeign(['conversation_id']);
-            $table->dropForeign(['sender_id']);
-            $table->dropForeign(['receiver_id']);
         });
         Capsule::schema()->dropIfExists('message');
     }

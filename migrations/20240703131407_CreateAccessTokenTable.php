@@ -17,15 +17,14 @@ class CreateAccessTokenTable extends Migration
     public function up(): void
     {
         Capsule::schema()->create('access_token', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('account_id')->unsigned();
+            $table->increments('id')->comment('Локальный идентификатор');
+            $table->unsignedInteger('account_id')->unsigned()->comment('Связь с аккаунтом');
             $table->text('access_token');
             $table->text('refresh_token');
-            $table->integer('expires');
+            $table->integer('expires')->comment('Точное время истечения');
             $table->timestamps();
 
-            $table
-                ->foreign('account_id')
+            $table->foreign('account_id')
                 ->references('id')
                 ->on('account')
                 ->onDelete('cascade');

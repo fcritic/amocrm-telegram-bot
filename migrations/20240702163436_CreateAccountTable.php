@@ -17,14 +17,14 @@ class CreateAccountTable extends Migration
     public function up(): void
     {
         Capsule::schema()->create('account', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('sub_domain')->index();
-            $table->integer('account_id')->index();
-            $table->string('account_uid');
-            $table->boolean('is_active');
+            $table->increments('id')->comment('Локальный идентификатор');
+            $table->string('sub_domain', 63)->index()->comment('Субдомен amoCRM');
+            $table->unsignedInteger('amo_account_id')->unique()->comment('ID аккаунта в amoCRM');
+            $table->uuid('amojo_id')->unique()->comment('UUID из API чатов amoCRM');
+            $table->boolean('is_active')->default(true)->index();
             $table->timestamps();
 
-            $table->unique(['sub_domain', 'account_id'], 'subdomain_account_unique');
+            $table->unique(['sub_domain', 'amo_account_id'], 'account_identity');
         });
     }
 
