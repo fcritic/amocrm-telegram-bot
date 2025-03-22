@@ -8,12 +8,10 @@ interface MessageRepositoryInterface
 {
     public function createMessage(
         int $conversationId,
-        string|null $amocrmMsgId,
-        string $telegramMsgId,
-        int $senderId,
-        int|null $receiverId,
+        string|null $amoMessageId,
+        int $telegramMessageId,
         string $type,
-        string|null $text,
+        string|null $content,
         string|null $media,
         string|null $fileName,
         int|null $fileSize,

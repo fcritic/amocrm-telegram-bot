@@ -25,33 +25,33 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
      * Создание модели внешнего пользователя в БД
      *
      * @param int $accountId ID аккаунта к которому относится контакт
-     * @param string $amocrmUid `ref_id`: ID на стороне API чатов AmoJoService
-     * @param string|null $telegramId ID пользователя в тг. Выступает как id контакта на стороне интеграции
+     * @param string $amoUserId `ref_id`: ID на стороне API чатов AmoJoService
+     * @param int|null $telegramUserId ID пользователя в тг. Выступает как id контакта на стороне интеграции
      * @param string|null $username Юзернейм на стороне тг
      * @param string|null $name Имя контакта
-     * @param string|null $number Номер телефон
-     * @param string|null $avatar Аватар пользователя
+     * @param string|null $phone Аватар пользователя
+     * @param string|null $avatar
      * @param string|null $profileLink
      * @return int
      */
     public function createExternalUser(
         int $accountId,
-        string $amocrmUid,
-        string $telegramId = null,
+        string $amoUserId,
+        int $telegramUserId = null,
         string|null $username = null,
         string|null $name = null,
-        string|null $number = null,
+        string|null $phone = null,
         string|null $avatar = null,
         string|null $profileLink = null
     ): int {
         /** @var ExternalUser $externalUser */
         $externalUser = $this->create([
             'account_id' => $accountId,
-            'amocrm_uid' => $amocrmUid,
-            'telegram_id' => $telegramId,
+            'amo_user_id' => $amoUserId,
+            'telegram_user_id' => $telegramUserId,
             'username' => $username,
             'name' => $name,
-            'number' => $number,
+            'phone' => $phone,
             'avatar' => $avatar,
             'profile_link' => $profileLink,
         ]);
@@ -61,35 +61,35 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
 
     /**
      * @param int $accountId
-     * @param string $amocrmUid
-     * @param string|null $telegramId
+     * @param string $amoUserId
+     * @param int|null $telegramUserId
      * @param string|null $username
      * @param string|null $name
-     * @param string|null $number
+     * @param string|null $phone
      * @param string|null $avatar
      * @param string|null $profileLink
      * @return ExternalUser
      */
     public function firstOrCreateExternalUser(
         int $accountId,
-        string $amocrmUid,
-        string $telegramId = null,
+        string $amoUserId,
+        int $telegramUserId = null,
         string|null $username = null,
         string|null $name = null,
-        string|null $number = null,
+        string|null $phone = null,
         string|null $avatar = null,
         string|null $profileLink = null
     ): ExternalUser {
         /** @var ExternalUser */
         return $this->firstOrCreate(
-            ['amocrm_uid' => $amocrmUid],
+            ['amo_user_id' => $amoUserId],
             [
                 'account_id' => $accountId,
-                'amocrm_uid' => $amocrmUid,
-                'telegram_id' => $telegramId,
+                'amo_user_id' => $amoUserId,
+                'telegram_user_id' => $telegramUserId,
                 'username' => $username,
                 'name' => $name,
-                'number' => $number,
+                'phone' => $phone,
                 'avatar' => $avatar,
                 'profile_link' => $profileLink,
             ]
@@ -104,11 +104,11 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
     public function getTokenByAvatar(string $avatar): ?string
     {
         return $this->query
-            ->with(['account.telegram'])
+            ->with(['account.telegramConnection'])
             ->where('avatar', $avatar)
             ->first()
             ?->account
-            ?->telegram
+            ?->telegramConnection
             ?->token_bot;
     }
 }

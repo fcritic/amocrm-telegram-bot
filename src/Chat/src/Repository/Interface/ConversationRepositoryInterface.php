@@ -13,18 +13,18 @@ interface ConversationRepositoryInterface
     public function createConversation(
         int $externalUserId,
         int $telegramChatId,
-        string $amocrmChatId
+        string $amoChatId
     ): Conversation;
 
     public function updateOrCreateConversation(
         int $externalUserId,
         int $telegramChatId,
-        string $amocrmChatId
+        string $amoChatId
     ): Conversation;
 
-    public function firstOrCreateConversation
-    (int $externalUserId,
+    public function firstOrCreateConversation(
+        int $externalUserId,
      int $telegramChatId,
-     string $amocrmChatId
+     string $amoChatId
     ): Conversation;
 }

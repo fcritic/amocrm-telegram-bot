@@ -30,7 +30,7 @@ readonly class TelegramWebhookHandler implements RequestHandlerInterface
     {
         try {
             $this->producer->produce(data: [
-                'secret' => $request->getHeaderLine('X-Telegram-Bot-Api-Secret-Token'),
+                'webhook_secret' => $request->getHeaderLine('X-TelegramConnection-Bot-Api-Secret-Token'),
                 'body' => $request->getParsedBody(),
             ]);
         } catch (Exception $e) {

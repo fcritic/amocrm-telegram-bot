@@ -12,12 +12,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int $id
  * @property int $conversation_id
- * @property string $amocrm_msg_id
- * @property string $telegram_msg_id
- * @property int $sender_id
- * @property int $receiver_id
+ * @property string $amo_message_id
+ * @property int $telegram_message_id
  * @property string $type
- * @property string $text
+ * @property string $content
  * @property string $media
  * @property string $file_name
  * @property int $file_size
@@ -42,12 +40,10 @@ class Message extends Model
      */
     protected $fillable = [
         'conversation_id',
-        'amocrm_msg_id',
-        'telegram_msg_id',
-        'sender_id',
-        'receiver_id',
+        'amo_message_id',
+        'telegram_message_id',
         'type',
-        'text',
+        'content',
         'media',
         'file_name',
         'file_size',
@@ -59,8 +55,7 @@ class Message extends Model
      */
     protected $casts = [
         'conversation_id' => 'integer',
-        'sender_id' => 'integer',
-        'receiver_id' => 'integer',
+        'telegram_message_id' => 'integer',
         'file_size' => 'integer',
     ];
 
@@ -71,23 +66,5 @@ class Message extends Model
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
-    }
-
-    /**
-     * Таблица принадлежит к таблице
-     * @return BelongsTo
-     */
-    public function sender(): BelongsTo
-    {
-        return $this->belongsTo(ExternalUser::class, 'sender_id');
-    }
-
-    /**
-     * Таблица принадлежит к таблице
-     * @return BelongsTo
-     */
-    public function receiver(): BelongsTo
-    {
-        return $this->belongsTo(ExternalUser::class, 'receiver_id');
     }
 }

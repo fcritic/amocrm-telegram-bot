@@ -21,10 +21,10 @@ class ConversationRepository extends AbstractRepository implements ConversationR
         return Conversation::class;
     }
 
-    public function getConversationById(string $conversationRefId): ?Conversation
+    public function getConversationById(string $amoChatId): ?Conversation
     {
         /** @var Conversation */
-        return $this->getBy('amocrm_chat_id', $conversationRefId);
+        return $this->getBy('amo_chat_id', $amoChatId);
     }
 
     /**
@@ -32,29 +32,29 @@ class ConversationRepository extends AbstractRepository implements ConversationR
      *
      * @param int $externalUserId ID контакта. Выступает в роле `sender_id` && `receiver_id`
      * @param int $telegramChatId ID чата тг. Выступает в роле ID чата на стороне интеграции AmoJoService
-     * @param string $amocrmChatId `ref_id`: ID на стороне API чатов AmoJoService
+     * @param string $amoChatId `ref_id`: ID на стороне API чатов AmoJoService
      * @return Conversation
      */
-    public function createConversation(int $externalUserId, int $telegramChatId, string $amocrmChatId): Conversation
+    public function createConversation(int $externalUserId, int $telegramChatId, string $amoChatId): Conversation
     {
         /** @var Conversation */
         return $this->create([
             'external_user_id' => $externalUserId,
             'telegram_chat_id' => $telegramChatId,
-            'amocrm_chat_id' => $amocrmChatId,
+            'amo_chat_id' => $amoChatId,
         ]);
     }
 
     /**
      * @param int $externalUserId
      * @param int $telegramChatId
-     * @param string $amocrmChatId
+     * @param string $amoChatId
      * @return Conversation
      */
     public function updateOrCreateConversation(
         int $externalUserId,
         int $telegramChatId,
-        string $amocrmChatId
+        string $amoChatId
     ): Conversation {
         /** @var Conversation */
         return $this->updateOrCreate(
@@ -62,7 +62,7 @@ class ConversationRepository extends AbstractRepository implements ConversationR
             [
                 'external_user_id' => $externalUserId,
                 'telegram_chat_id' => $telegramChatId,
-                'amocrm_chat_id' => $amocrmChatId,
+                'amo_chat_id' => $amoChatId,
             ]
         );
     }
@@ -70,21 +70,21 @@ class ConversationRepository extends AbstractRepository implements ConversationR
     /**
      * @param int $externalUserId
      * @param int $telegramChatId
-     * @param string $amocrmChatId
+     * @param string $amoChatId
      * @return Conversation
      */
     public function firstOrCreateConversation(
         int $externalUserId,
         int $telegramChatId,
-        string $amocrmChatId
+        string $amoChatId
     ): Conversation {
         /** @var Conversation */
         return $this->firstOrCreate(
-            ['amocrm_chat_id' => $amocrmChatId],
+            ['amocrm_chat_id' => $amoChatId],
             [
                 'external_user_id' => $externalUserId,
                 'telegram_chat_id' => $telegramChatId,
-                'amocrm_chat_id' => $amocrmChatId,
+                'amo_chat_id' => $amoChatId,
             ]
         );
     }

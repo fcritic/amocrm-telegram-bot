@@ -14,15 +14,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $account_id
  * @property string $token_bot
- * @property string $secret_token
+ * @property string $webhook_secret
  */
-class Telegram extends Model
+class TelegramConnection extends Model
 {
     /**
      * Таблица связанная с моделью
      * @var string
      */
-    protected $table = 'telegram';
+    protected $table = 'telegram_connection';
 
     /**
      * Указывает, что временные метки created_at/updated_at должны использоваться
@@ -37,7 +37,7 @@ class Telegram extends Model
     protected $fillable = [
         'account_id',
         'token_bot',
-        'secret_token',
+        'webhook_secret',
     ];
 
     /**

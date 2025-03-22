@@ -11,6 +11,7 @@ use AmoJo\Webhook\AbstractWebHookEvent;
 use AmoJo\Webhook\OutgoingMessageEvent;
 use AmoJo\Webhook\ReactionEvent;
 use AmoJo\Webhook\TypingEvent;
+use App\Exception\NotFountTokenException;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
@@ -36,7 +37,12 @@ class TelegramEventService
      */
     public function sendEventTelegram(AbstractWebHookEvent $event): void
     {
-        $token = $this->accountRepo->getTelegramToken(accountUid: $event->getAccountUid());
+        $token = $this->accountRepo->getTelegramToken(amoJoId: $event->getAccountUid());
+
+        if ($token === null) {
+            throw new NotFountTokenException('Telegram token not found');
+        }
+
         $this->bot = $this->factoryBotApi->make(token: $token);
 
         match (true) {

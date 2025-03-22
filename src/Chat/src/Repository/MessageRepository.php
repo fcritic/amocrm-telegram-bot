@@ -25,12 +25,10 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
      * Создание модели сообщения в БД
      *
      * @param int $conversationId ID сущности чата
-     * @param string|null $amocrmMsgId `ref_id`: ID на стороне API чатов AmoJoService
-     * @param string $telegramMsgId ID сообщения в тг. Выступает как id сообщения на стороне интеграции
-     * @param int $senderId Отправитель(сущность контакта) сообщения в AmoJoService
-     * @param int|null $receiverId Получатель(сущность контакта) сообщения в AmoJoService
+     * @param string|null $amoMessageId `ref_id`: ID на стороне API чатов AmoJoService
+     * @param int $telegramMessageId ID сообщения в тг. Выступает как id сообщения на стороне интеграции
      * @param string $type Тип сообщения
-     * @param string|null $text Текст
+     * @param string|null $content Текст
      * @param string|null $media Медиа
      * @param string|null $fileName Имя файла
      * @param int|null $fileSize Размер файла
@@ -38,12 +36,10 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
      */
     public function createMessage(
         int $conversationId,
-        string|null $amocrmMsgId,
-        string $telegramMsgId,
-        int $senderId,
-        int|null $receiverId,
+        string|null $amoMessageId,
+        int $telegramMessageId,
         string $type,
-        string|null $text,
+        string|null $content,
         string|null $media,
         string|null $fileName,
         int|null $fileSize,
@@ -51,12 +47,10 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
         /** @var Message $message */
         $message = $this->create([
             'conversation_id' => $conversationId,
-            'amocrm_msg_id' => $amocrmMsgId,
-            'telegram_msg_id' => $telegramMsgId,
-            'sender_id' => $senderId,
-            'receiver_id' => $receiverId,
+            'amo_message_id' => $amoMessageId,
+            'telegram_message_id' => $telegramMessageId,
             'type' => $type,
-            'text' => $text,
+            'content' => $content,
             'media' => $media,
             'file_name' => $fileName,
             'file_size' => $fileSize,
@@ -73,12 +67,13 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
     public function getTokenByMedia(string $media): ?string
     {
         return $this->query
-            ->with(['sender.account.telegram'])
+            ->with(['conversation.externalUser.account.telegramConnection'])
             ->where('media', $media)
             ->first()
-            ?->sender
+            ?->conversation
+            ?->externalUser
             ?->account
-            ?->telegram
+            ?->telegramConnection
             ?->token_bot;
     }
 }

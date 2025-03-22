@@ -30,7 +30,7 @@ readonly class TelegramWebhookMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            if (! $this->settings->isValidWebhook($request->getHeaderLine('X-Telegram-Bot-Api-Secret-Token'))) {
+            if (! $this->settings->isValidWebhook($request->getHeaderLine('X-TelegramConnection-Bot-Api-Secret-Token'))) {
                 return new Response(ResponseMessage::INVALID_REQUEST);
             }
         } catch (Exception $e) {

@@ -7,15 +7,15 @@ namespace Account\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Telegram\Model\Telegram;
+use Telegram\Model\TelegramConnection;
 
 /**
  * Модель аккаунта
  *
  * @property int $id
  * @property string $sub_domain
- * @property int $account_id
- * @property string $account_uid
+ * @property int $amo_account_id
+ * @property string $amojo_id
  * @property bool $is_active
  */
 class Account extends Model
@@ -38,8 +38,8 @@ class Account extends Model
      */
     protected $fillable = [
         'sub_domain',
-        'account_id',
-        'account_uid',
+        'amo_account_id',
+        'amojo_id',
         'is_active',
     ];
 
@@ -48,7 +48,7 @@ class Account extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'account_id' => 'integer',
+        'amo_account_id' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -56,9 +56,9 @@ class Account extends Model
      * Связь один к одному
      * @return HasOne
      */
-    public function telegram(): HasOne
+    public function telegramConnection(): HasOne
     {
-        return $this->hasOne(Telegram::class);
+        return $this->hasOne(TelegramConnection::class);
     }
 
     /**

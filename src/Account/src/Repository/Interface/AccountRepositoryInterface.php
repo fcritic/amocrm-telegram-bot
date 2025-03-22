@@ -8,11 +8,11 @@ use Account\Model\Account;
 
 interface AccountRepositoryInterface
 {
-    public function firstOrCreateAccount(string $subDomain, int $accountId, string $accountUid): int;
+    public function firstOrCreateAccount(string $subDomain, int $amoAccountId, string $amoJoId): int;
 
-    public function getAccountById(int $accountId): ?Account;
+    public function getAccountById(int $amoAccountId): ?Account;
 
-    public function getTelegramToken(string $accountUid): ?string;
+    public function getTelegramToken(string $amoJoId): ?string;
 
     public function getFieldsId(string $subDomain): array;
 }

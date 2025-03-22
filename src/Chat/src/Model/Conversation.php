@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property int $external_user_id
- * @property string $telegram_chat_id
- * @property string $amocrm_chat_id
+ * @property int $telegram_chat_id
+ * @property string $amo_chat_id
  */
 class Conversation extends Model
 {
@@ -37,7 +37,7 @@ class Conversation extends Model
     protected $fillable = [
         'external_user_id',
         'telegram_chat_id',
-        'amocrm_chat_id',
+        'amo_chat_id',
     ];
 
     /**
@@ -46,6 +46,7 @@ class Conversation extends Model
      */
     protected $casts = [
         'external_user_id' => 'integer',
+        'telegram_chat_id' => 'integer',
     ];
 
     /**

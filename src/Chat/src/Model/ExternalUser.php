@@ -14,11 +14,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property int $account_id
- * @property string $amocrm_uid
- * @property string $telegram_id
+ * @property string $amo_user_id
+ * @property int $telegram_user_id
  * @property string $username
  * @property string $name
- * @property string $number
+ * @property string $phone
  * @property string $avatar
  * @property string $profile_link
  */
@@ -42,11 +42,11 @@ class ExternalUser extends Model
      */
     protected $fillable = [
         'account_id',
-        'amocrm_uid',
-        'telegram_id',
+        'amo_user_id',
+        'telegram_user_id',
         'username',
         'name',
-        'number',
+        'phone',
         'avatar',
         'profile_link',
     ];
@@ -56,7 +56,8 @@ class ExternalUser extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'account_id' => 'integer'
+        'account_id' => 'integer',
+        'telegram_user_id' => 'integer'
     ];
 
     /**

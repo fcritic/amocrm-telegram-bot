@@ -6,12 +6,12 @@ namespace Telegram\Repository;
 
 use App\Repository\AbstractRepository;
 use Telegram\Model\TelegramConnection;
-use Telegram\Repository\Interface\TelegramRepositoryInterface;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 
 /**
  * Репозиторий телеграмм бота
  */
-class TelegramRepository extends AbstractRepository implements TelegramRepositoryInterface
+class TelegramConnectionRepository extends AbstractRepository implements TelegramConnectionRepositoryInterface
 {
     /**
      * @return string
@@ -26,10 +26,10 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
      *
      * @param int $accountId ID пользователя
      * @param string $botToken Токен тг бота
-     * @param string $secretToken Секретный ключ для хука тг бота
-     * @return int
+     * @param string $webhookSecret Секретный ключ для хука тг бота
+     * @return TelegramConnection
      */
-    public function updateOrCreateTelegram(int $accountId, string $botToken, string $secretToken): TelegramConnection
+    public function updateOrCreateTelegram(int $accountId, string $botToken, string $webhookSecret): TelegramConnection
     {
         /** @var TelegramConnection */
         return $this->updateOrCreate(
@@ -37,7 +37,7 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
             [
                 'account_id' => $accountId,
                 'token_bot' => $botToken,
-                'secret_token' => $secretToken,
+                'webhook_secret' => $webhookSecret,
             ]
         );
     }
@@ -48,9 +48,9 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
         return $this->getBy('token_bot', $token);
     }
 
-    public function getBySecret(string $secretToken): ?TelegramConnection
+    public function getBySecret(string $webhookSecret): ?TelegramConnection
     {
         /** @var TelegramConnection */
-        return $this->getBy('secret_token', $secretToken);
+        return $this->getBy('webhook_secret', $webhookSecret);
     }
 }

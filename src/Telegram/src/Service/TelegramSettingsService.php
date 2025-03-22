@@ -11,8 +11,8 @@ use AmoCRM\Service\Factory\AmoCRMApiClientFactory;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Uuid;
-use Telegram\Model\Telegram;
-use Telegram\Repository\Interface\TelegramRepositoryInterface;
+use Telegram\Model\TelegramConnection;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Telegram\Service\Factory\TelegramBotApiFactory;
 use Vjik\TelegramBot\Api\TelegramBotApi;
 
@@ -23,7 +23,7 @@ class TelegramSettingsService
 
     public function __construct(
         protected readonly TelegramBotApiFactory $factoryBotApi,
-        protected readonly TelegramRepositoryInterface $telegramRepo,
+        protected readonly TelegramConnectionRepositoryInterface $telegramRepo,
         protected readonly AmoCRMApiClientFactory $amoCRMClientFactory,
         protected readonly string $urlWebhook
     ) {
@@ -70,10 +70,10 @@ class TelegramSettingsService
      */
     public function isValidWebhook(string $secretHeader): bool
     {
-        /** @var Telegram $secret */
+        /** @var TelegramConnection $secret */
         $secret = $this->telegramRepo->getBySecret($secretHeader);
 
-        return hash_equals($secret->secret_token, $secretHeader);
+        return hash_equals($secret->webhook_secret, $secretHeader);
     }
 
     /**

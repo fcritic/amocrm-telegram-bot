@@ -10,22 +10,22 @@ interface ExternalUserRepositoryInterface
 {
     public function createExternalUser(
         int $accountId,
-        string $amocrmUid,
-        string $telegramId = null,
+        string $amoUserId,
+        int $telegramUserId = null,
         string|null $username = null,
         string|null $name = null,
-        string|null $number = null,
+        string|null $phone = null,
         string|null $avatar = null,
         string|null $profileLink = null
     ): int;
 
     public function firstOrCreateExternalUser(
         int $accountId,
-        string $amocrmUid,
-        string $telegramId = null,
+        string $amoUserId,
+        int $telegramUserId = null,
         string|null $username = null,
         string|null $name = null,
-        string|null $number = null,
+        string|null $phone = null,
         string|null $avatar = null,
         string|null $profileLink = null
     ): ExternalUser;

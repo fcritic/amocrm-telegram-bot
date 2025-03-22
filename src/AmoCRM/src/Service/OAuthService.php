@@ -36,7 +36,7 @@ class OAuthService implements OAuthServiceInterface
     }
 
     /**
-     * @param array $params
+     * @param array<string, string> $params
      * @return void
      * @throws AmoCRMApiException
      * @throws AmoCRMoAuthApiException
@@ -80,18 +80,18 @@ class OAuthService implements OAuthServiceInterface
      */
     public function saveOAuthToken(AccessTokenInterface $accessToken, string $baseDomain): void
     {
-        /** @var Model|null $query */
+        /** @var array<string, int> $query */
         $query = $this->accountRepo->getFieldsId($baseDomain);
-        $fieldTokenId = $query?->getAttributeValue('fieldTokenId');
+        $fieldTokenId = $query['field_access_token_id'];
 
-        if ($query?->getAttributeValue('fieldTokenId') !== null) {
+        if ($fieldTokenId !== null) {
             $this->accessTokenRepo->updateAccessToken(
                 id: $fieldTokenId,
                 accessToken: $accessToken
             );
         } else {
             $this->accessTokenRepo->createAccessToken(
-                accountId: $query?->getAttributeValue('fieldAccountId'),
+                accountId: $query['field_account_id'],
                 accessToken: $accessToken
             );
         }
@@ -107,8 +107,8 @@ class OAuthService implements OAuthServiceInterface
     {
         $this->accountRepo->firstOrCreateAccount(
             subDomain: $this->client->getAccountBaseDomain(),
-            accountId: $this->client->account()->getCurrent()?->getId(),
-            accountUid: $this->client->account()->getCurrent(
+            amoAccountId: $this->client->account()->getCurrent()?->getId(),
+            amoJoId: $this->client->account()->getCurrent(
                 with: AccountModel::getAvailableWith()
             )?->getAmojoId()
         );

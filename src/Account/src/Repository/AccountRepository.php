@@ -26,20 +26,19 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
      * Создание модели аккаунта в БД
      *
      * @param string $subDomain Домен аккаунта
-     * @param int $accountId ID аккаунта
-     * @param string $accountUid ID аккаунта на стороне amojo
+     * @param int $amoAccountId ID аккаунта
+     * @param string $amoJoId ID аккаунта на стороне amojo
      * @return int
      */
-    public function firstOrCreateAccount(string $subDomain, int $accountId, string $accountUid): int
+    public function firstOrCreateAccount(string $subDomain, int $amoAccountId, string $amoJoId): int
     {
         /** @var Account $account */
         $account = $this->firstOrCreate(
-            ['account_id' => $accountId],
+            ['amo_account_id' => $amoAccountId],
             [
-                'sub_domain'  => $subDomain,
-                'account_id'  => $accountId,
-                'account_uid' => $accountUid,
-                'is_active'   => true,
+                'sub_domain' => $subDomain,
+                'amo_account_id' => $amoAccountId,
+                'amojo_id' => $amoJoId,
             ]
         );
 
@@ -47,25 +46,25 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
     }
 
     /**
-     * @param int $accountId
+     * @param int $amoAccountId
      * @return Model|null
      */
-    public function getAccountById(int $accountId): ?Account
+    public function getAccountById(int $amoAccountId): ?Account
     {
-        return $this->getBy('account_id', $accountId);
+        return $this->getBy('amo_account_id', $amoAccountId);
     }
 
     /**
-     * @param string $accountUid amoJoId аккаунта (ID аккаунта на стороне API чатов)
+     * @param string $amoJoId amoJoId аккаунта (ID аккаунта на стороне API чатов)
      * @return string|null
      */
-    public function getTelegramToken(string $accountUid): ?string
+    public function getTelegramToken(string $amoJoId): ?string
     {
         return $this->query
-            ->with('telegram')
-            ->where('account_uid', $accountUid)
+            ->with('telegramConnection')
+            ->where('amojo_id', $amoJoId)
             ->first()
-            ?->telegram
+            ?->telegramConnection
             ?->token_bot;
     }
 

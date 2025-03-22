@@ -6,11 +6,11 @@ namespace Telegram\Repository\Interface;
 
 use Telegram\Model\TelegramConnection;
 
-interface TelegramRepositoryInterface
+interface TelegramConnectionRepositoryInterface
 {
-    public function getBySecret(string $secretToken): ?TelegramConnection;
+    public function getBySecret(string $webhookSecret): ?TelegramConnection;
 
-    public function updateOrCreateTelegram(int $accountId, string $botToken, string $secretToken): TelegramConnection;
+    public function updateOrCreateTelegram(int $accountId, string $botToken, string $webhookSecret): TelegramConnection;
 
     public function getByToken(string $token): ?TelegramConnection;
 }
