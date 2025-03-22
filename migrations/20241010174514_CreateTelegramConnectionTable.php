@@ -9,7 +9,7 @@ use Phpmig\Migration\Migration;
 /**
  * Миграция таблицы Токенов Telegram
  */
-class CreateTelegramTable extends Migration
+class CreateTelegramConnectionTable extends Migration
 {
     /**
      * Выполните миграцию
@@ -18,12 +18,11 @@ class CreateTelegramTable extends Migration
      */
     public function up(): void
     {
-        Capsule::schema()->create('telegram', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('account_id')->unsigned()->index();
-            $table->text('token_bot');
-            $table->string('secret_token', 255)->index();
-            $table->timestamps();
+        Capsule::schema()->create('telegram_connection', function (Blueprint $table) {
+            $table->unsignedInteger('id')->primary()->comment('Локальный идентификатор');
+            $table->unsignedInteger('account_id')->unsigned()->comment('Связь с аккаунтом');
+            $table->string('token_bot', 128)->unique()->index()->comment('Токен для телеграмм бота');
+            $table->string('webhook_secret', 64)->index()->unique()->comment('HMAC для верификации');
 
             $table
                 ->foreign('account_id')

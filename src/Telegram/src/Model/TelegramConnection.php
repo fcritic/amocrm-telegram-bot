@@ -6,9 +6,7 @@ namespace Telegram\Model;
 
 use Account\Model\Account;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Crypt;
 
 /**
  * Модель токена для телеграмм бота

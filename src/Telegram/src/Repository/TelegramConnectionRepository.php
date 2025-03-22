@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Telegram\Repository;
 
 use App\Repository\AbstractRepository;
-use Telegram\Model\Telegram;
+use Telegram\Model\TelegramConnection;
 use Telegram\Repository\Interface\TelegramRepositoryInterface;
 
 /**
@@ -18,7 +18,7 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
      */
     public function getModelClass(): string
     {
-        return Telegram::class;
+        return TelegramConnection::class;
     }
 
     /**
@@ -29,9 +29,9 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
      * @param string $secretToken Секретный ключ для хука тг бота
      * @return int
      */
-    public function updateOrCreateTelegram(int $accountId, string $botToken, string $secretToken): Telegram
+    public function updateOrCreateTelegram(int $accountId, string $botToken, string $secretToken): TelegramConnection
     {
-        /** @var Telegram */
+        /** @var TelegramConnection */
         return $this->updateOrCreate(
             ['account_id' => $accountId],
             [
@@ -42,15 +42,15 @@ class TelegramRepository extends AbstractRepository implements TelegramRepositor
         );
     }
 
-    public function getByToken(string $token): ?Telegram
+    public function getByToken(string $token): ?TelegramConnection
     {
-        /** @var Telegram */
+        /** @var TelegramConnection */
         return $this->getBy('token_bot', $token);
     }
 
-    public function getBySecret(string $secretToken): ?Telegram
+    public function getBySecret(string $secretToken): ?TelegramConnection
     {
-        /** @var Telegram */
+        /** @var TelegramConnection */
         return $this->getBy('secret_token', $secretToken);
     }
 }
