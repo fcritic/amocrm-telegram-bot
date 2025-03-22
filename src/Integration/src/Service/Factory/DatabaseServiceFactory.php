@@ -12,7 +12,7 @@ use Doctrine\DBAL\ConnectionException;
 use Integration\Service\DatabaseService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Telegram\Repository\TelegramRepository;
+use Telegram\Repository\TelegramConnectionRepository;
 use Telegram\Service\Factory\TelegramBotApiFactory;
 
 class DatabaseServiceFactory
@@ -28,7 +28,7 @@ class DatabaseServiceFactory
                 conversationRepo: $container->get(ConversationRepository::class),
                 externalUserRepo: $container->get(ExternalUserRepository::class),
                 messageRepo: $container->get(MessageRepository::class),
-                telegramRepo: $container->get(TelegramRepository::class),
+                telegramRepo: $container->get(TelegramConnectionRepository::class),
             );
         } catch (ContainerExceptionInterface $e) {
             throw new ConnectionException($e->getMessage());

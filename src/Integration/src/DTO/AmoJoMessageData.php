@@ -19,7 +19,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     public function getAccountIdentifier(): array
     {
         return [
-            'type' => 'account_uid',
+            'type' => 'amojo_id',
             'value' => $this->event->getAccountUid()
         ];
     }
@@ -27,7 +27,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getConversationId(): ?string
+    public function getExternalChatId(): ?string
     {
         return $this->event->getConversation()->getId();
     }
@@ -35,7 +35,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getConversationRefId(): ?string
+    public function getAmoChatId(): ?string
     {
         return $this->event->getConversation()->getRefId();
     }
@@ -43,7 +43,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getReceiverId(): ?string
+    public function getAmoUserId(): ?string
     {
         return $this->event->getReceiver()->getId();
     }
@@ -51,7 +51,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getReceiverRefId(): ?string
+    public function getExternalUserId(): ?string
     {
         return $this->event->getReceiver()->getRefId();
     }
@@ -59,23 +59,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getSenderId(): ?string
-    {
-        return $this->event->getSender()->getId();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSenderRefId(): ?string
-    {
-        return $this->event->getSender()->getRefId();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getReceiverName(): ?string
+    public function getExternalUserName(): ?string
     {
         return $this->event->getReceiver()->getName();
     }
@@ -83,15 +67,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getSenderName(): ?string
-    {
-        return $this->event->getSender()->getName();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPhone(): ?string
+    public function getExternalUserPhone(): ?string
     {
         return $this->event->getReceiver()->getProfile()?->getPhone();
     }
@@ -99,7 +75,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getUsername(): ?string
+    public function getExternalUserUsername(): ?string
     {
         return null;
     }
@@ -107,7 +83,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getAvatar(): ?string
+    public function getExternalUserAvatar(): ?string
     {
         return $this->event->getReceiver()->getAvatar();
     }
@@ -115,7 +91,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getProfileLink(): ?string
+    public function getExternalUserProfileLink(): ?string
     {
         return $this->event->getReceiver()->getProfileLink();
     }
@@ -123,7 +99,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getMessageId(): ?string
+    public function getExternalMessageId(): ?string
     {
         return $this->event->getMessage()->getUid();
     }
@@ -131,7 +107,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getMessageRefId(): ?string
+    public function getAmoMessageId(): ?string
     {
         return $this->event->getMessage()->getRefUid();
     }
@@ -147,7 +123,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getMessageText(): ?string
+    public function getMessageContent(): ?string
     {
         return $this->event->getMessage()->getText();
     }

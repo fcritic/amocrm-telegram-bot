@@ -18,78 +18,63 @@ readonly class TelegramMessageData implements MessageDataInterface
     public function getAccountIdentifier(): array
     {
         return [
-          'type' => 'secret_token',
+          'type' => 'webhook_secret',
           'value' => $this->secret,
         ];
     }
 
-    public function getConversationId(): ?string
+    public function getExternalChatId(): ?string
     {
         return (string) $this->event?->message->chat->id;
     }
 
-    public function getConversationRefId(): ?string
+    public function getAmoChatId(): ?string
     {
         return null;
     }
 
-    public function getReceiverId(): ?string
+    public function getAmoUserId(): ?string
     {
         return null;
     }
 
-    public function getReceiverRefId(): ?string
-    {
-        return null;
-    }
-
-    public function getSenderId(): ?string
+    public function getExternalUserId(): ?string
     {
         return (string) $this->event?->message->from->id;
     }
 
-    public function getSenderRefId(): ?string
-    {
-        return null;
-    }
-
-    public function getReceiverName(): ?string
-    {
-        return null;
-    }
-
-    public function getSenderName(): ?string
+    public function getExternalUserName(): ?string
     {
         return $this->event?->message->from->firstName;
     }
 
-    public function getPhone(): ?string
+    public function getExternalUserPhone(): ?string
     {
         return null;
     }
 
-    public function getUsername(): ?string
+    public function getExternalUserUsername(): ?string
     {
         return $this->event?->message->from->username;
     }
 
     /** TODO нужно возвращать аватар */
-    public function getAvatar(): ?string
+    public function getExternalUserAvatar(): ?string
     {
         return null;
     }
 
-    public function getProfileLink(): ?string
+    public function getExternalUserProfileLink(): ?string
     {
-        return 'https://t.me/' . $this->getUsername();
+        return 'https://t.me/' . $this->getExternalUserUsername();
     }
 
-    public function getMessageId(): ?string
+    public function getExternalMessageId(): ?string
     {
         return (string) $this->event?->message->messageId;
     }
 
-    public function getMessageRefId(): ?string
+    public function getAmoMessageId(): ?string
     {
         return null;
     }
@@ -110,7 +95,7 @@ readonly class TelegramMessageData implements MessageDataInterface
         };
     }
 
-    public function getMessageText(): ?string
+    public function getMessageContent(): ?string
     {
         return $this->event?->message->text;
     }

@@ -16,8 +16,8 @@ use Chat\Model\ExternalUser;
 use Integration\DTO\MessageDataInterface;
 use RuntimeException;
 use App\Exception\InvalidConversationOwnerException;
-use Telegram\Model\Telegram;
-use Telegram\Repository\Interface\TelegramRepositoryInterface;
+use Telegram\Model\TelegramConnection;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Telegram\Service\TelegramSettingsService;
 use Throwable;
 
@@ -28,7 +28,7 @@ readonly class DatabaseService
         protected ConversationRepositoryInterface $conversationRepo,
         protected ExternalUserRepositoryInterface $externalUserRepo,
         protected MessageRepositoryInterface $messageRepo,
-        protected TelegramRepositoryInterface $telegramRepo,
+        protected TelegramConnectionRepositoryInterface $telegramRepo,
     ) {
     }
 
@@ -47,20 +47,10 @@ readonly class DatabaseService
             }
 
             $externalUser = $this->saveExternalUser(accountId: $accountId, dtoDb: $dtoDb);
-            $user = $this->saveUser(accountId: $accountId, dtoDb: $dtoDb);
             $conversation = $this->saveConversation(externalUser: $externalUser, dtoDb: $dtoDb);
-            $this->saveMessage(externalUser: $externalUser, user: $user, conversation: $conversation, dtoDb: $dtoDb);
-        });
-    }
 
-    protected function saveUser(int $accountId, MessageDataInterface $dtoDb): ExternalUser
-    {
-        /** @var ExternalUser */
-        return $this->externalUserRepo->firstOrCreateExternalUser(
-            accountId: $accountId,
-            amocrmUid: $dtoDb->getSenderRefId(),
-            name: $dtoDb->getSenderName(),
-        );
+            $this->saveMessage(conversation: $conversation, dtoDb: $dtoDb);
+        });
     }
 
     protected function saveExternalUser(int $accountId, MessageDataInterface $dtoDb): ExternalUser
@@ -68,10 +58,13 @@ readonly class DatabaseService
         /** @var ExternalUser */
         return $this->externalUserRepo->firstOrCreateExternalUser(
             accountId: $accountId,
-            amocrmUid: $dtoDb->getReceiverRefId(),
-            telegramId: $dtoDb->getReceiverId(),
-            name: $dtoDb->getReceiverName(),
-            number: $dtoDb->getPhone(),
+            amoUserId: $dtoDb->getAmoUserId(),
+            telegramUserId: (int) $dtoDb->getExternalUserId(),
+            username: $dtoDb->getExternalUserUsername(),
+            name: $dtoDb->getExternalUserName(),
+            phone: $dtoDb->getExternalUserPhone(),
+            avatar: $dtoDb->getExternalUserAvatar(),
+            profileLink: $dtoDb->getExternalUserProfileLink(),
         );
     }
 
@@ -81,40 +74,34 @@ readonly class DatabaseService
     protected function saveConversation(ExternalUser $externalUser, MessageDataInterface $dtoDb): Conversation
     {
         /** @var Conversation $conversation */
-        $conversation = $this->conversationRepo->getConversationById($dtoDb->getConversationRefId());
+        $conversation = $this->conversationRepo->getConversationById($dtoDb->getAmoChatId());
 
         if ($conversation === null || $conversation->external_user_id === $externalUser->id) {
             /** @var Conversation */
             return $this->conversationRepo->updateOrCreateConversation(
                 externalUserId: $externalUser->id,
-                telegramChatId: (int) $dtoDb->getConversationId(),
-                amocrmChatId: $dtoDb->getConversationRefId(),
+                telegramChatId: (int) $dtoDb->getExternalChatId(),
+                amoChatId: $dtoDb->getAmoChatId(),
             );
         }
 
         throw new InvalidConversationOwnerException(
-            "The conversation {$conversation->amocrm_chat_id} 
-            does not belong to an external user {$externalUser->amocrm_uid}"
+            "The conversation {$conversation->amo_chat_id} 
+            does not belong to an external user {$externalUser->amo_user_id}"
         );
     }
 
-    protected function saveMessage(
-        ExternalUser $externalUser,
-        ExternalUser $user,
-        Conversation $conversation,
-        MessageDataInterface $dtoDb
-    ): void {
+    protected function saveMessage(Conversation $conversation, MessageDataInterface $dtoDb): void
+    {
         $this->messageRepo->createMessage(
             conversationId: $conversation->id,
-            amocrmMsgId: $dtoDb->getMessageRefId(),
-            telegramMsgId: $dtoDb->getMessageId(),
-            senderId: $user->id,
-            receiverId: $externalUser->id,
+            amoMessageId: $dtoDb->getAmoMessageId(),
+            telegramMessageId: (int) $dtoDb->getExternalMessageId(),
             type: $dtoDb->getMessageType(),
-            text: $dtoDb->getMessageText(),
+            content: $dtoDb->getMessageContent(),
             media: $dtoDb->getMedia(),
             fileName: $dtoDb->getFileName(),
-            fileSize: (int) $dtoDb->getFileSize(),
+            fileSize: $dtoDb->getFileSize(),
         );
     }
 
@@ -123,7 +110,7 @@ readonly class DatabaseService
      */
     public function saveTelegramToken(string $token, string $accountId): void
     {
-        /** @var Telegram|null $telegram */
+        /** @var TelegramConnection|null $telegram */
         $telegram = $this->telegramRepo->getByToken($token);
 
         /** @var Account $account */
@@ -133,25 +120,26 @@ readonly class DatabaseService
         if (($telegram !== null) && $telegram->account_id !== $account->id) {
             throw new InvalidTokenOwnerException();
         }
+
         $this->telegramRepo->updateOrCreateTelegram(
             accountId: $account->id,
             botToken: $token,
-            secretToken: TelegramSettingsService::generateSecretToken($token)
+            webhookSecret: TelegramSettingsService::generateSecretToken($token)
         );
     }
 
     protected function getByIdentifier(array $identifier): ?int
     {
-        /** @var Telegram|Account $model */
+        /** @var TelegramConnection|Account $model */
         $model = match ($identifier['type']) {
-            'account_uid'  => $this->accountRepo->getBy($identifier['type'], $identifier['value']),
-            'secret_token' => $this->telegramRepo->getBySecret($identifier['value']),
-            default        => null
+            'amojo_id'       => $this->accountRepo->getBy($identifier['type'], $identifier['value']),
+            'webhook_secret' => $this->telegramRepo->getBySecret($identifier['value']),
+            default          => null
         };
 
         return match (true) {
             $model instanceof Account => $model->id,
-            $model instanceof Telegram => $model->account_id,
+            $model instanceof TelegramConnection => $model->account_id,
             default => null,
         };
     }

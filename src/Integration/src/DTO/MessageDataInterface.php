@@ -14,72 +14,57 @@ interface MessageDataInterface
     /**
      * @return string|null
      */
-    public function getConversationId(): ?string;
+    public function getExternalChatId(): ?string;
 
     /**
      * @return string|null
      */
-    public function getConversationRefId(): ?string;
+    public function getAmoChatId(): ?string;
 
     /**
      * @return string|null
      */
-    public function getReceiverId(): ?string;
+    public function getAmoUserId(): ?string;
 
     /**
      * @return string|null
      */
-    public function getReceiverRefId(): ?string;
+    public function getExternalUserId(): ?string;
 
     /**
      * @return string|null
      */
-    public function getSenderId(): ?string;
+    public function getExternalUserName(): ?string;
 
     /**
      * @return string|null
      */
-    public function getSenderRefId(): ?string;
+    public function getExternalUserPhone(): ?string;
 
     /**
      * @return string|null
      */
-    public function getReceiverName(): ?string;
+    public function getExternalUserUsername(): ?string;
 
     /**
      * @return string|null
      */
-    public function getSenderName(): ?string;
+    public function getExternalUserAvatar(): ?string;
 
     /**
      * @return string|null
      */
-    public function getPhone(): ?string;
+    public function getExternalUserProfileLink(): ?string;
 
     /**
      * @return string|null
      */
-    public function getUsername(): ?string;
+    public function getAmoMessageId(): ?string;
 
     /**
      * @return string|null
      */
-    public function getAvatar(): ?string;
-
-    /**
-     * @return string|null
-     */
-    public function getProfileLink(): ?string;
-
-    /**
-     * @return string|null
-     */
-    public function getMessageId(): ?string;
-
-    /**
-     * @return string|null
-     */
-    public function getMessageRefId(): ?string;
+    public function getExternalMessageId(): ?string;
 
     /**
      * @return string|null
@@ -89,7 +74,7 @@ interface MessageDataInterface
     /**
      * @return string|null
      */
-    public function getMessageText(): ?string;
+    public function getMessageContent(): ?string;
 
     /**
      * @return string|null
