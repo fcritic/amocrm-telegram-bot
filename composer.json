@@ -51,7 +51,7 @@
         "davedevelopment/phpmig": "^1.7",
         "doctrine/dbal": "^3.0",
         "fcritic/amojo-api-client": "dev-feature/parse-wh",
-        "illuminate/database": "^8.0",
+        "illuminate/database": "^12.3",
         "laminas/laminas-component-installer": "^3",
         "laminas/laminas-config-aggregator": "^1.6",
         "laminas/laminas-diactoros": "^2.4.1",
