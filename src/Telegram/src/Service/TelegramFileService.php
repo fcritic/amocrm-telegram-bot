@@ -9,6 +9,8 @@ use Chat\Repository\Interface\MessageRepositoryInterface;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
+use Telegram\Repository\TelegramConnectionRepository;
 use Telegram\Service\Factory\TelegramBotApiFactory;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -21,6 +23,7 @@ readonly class FileService
         protected TelegramBotApiFactory $botFactory,
         protected ExternalUserRepositoryInterface $externalUserRepo,
         protected MessageRepositoryInterface $messageRepo,
+        protected TelegramConnectionRepositoryInterface $telegramRepo,
     ) {
     }
 
@@ -44,6 +47,17 @@ readonly class FileService
         $fileUrl = $bot->makeFileUrl($bot->getFile($fileId));
 
         return $this->client->get($fileUrl, ['stream' => true]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getFileId(int $telegramUserId, string $webhookSecret): string
+    {
+        $token = $this->telegramRepo->getBySecret($webhookSecret)->token_bot;
+        $bot = $this->botFactory->make($token);
+
+        return $bot->getUserProfilePhotos($telegramUserId)->photos[0][2]->fileId;
     }
 
     protected function getTokenByAvatar(string $fileId): ?string

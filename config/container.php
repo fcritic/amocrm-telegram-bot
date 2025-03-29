@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-use Laminas\Pimple\Config\Config;
-use Laminas\Pimple\Config\ContainerFactory;
+use Laminas\ServiceManager\ServiceManager;
 
-$config  = require __DIR__ . '/config.php';
-$factory = new ContainerFactory();
+// Load configuration
+$config = require 'config/config.php';
 
-return $factory(new Config($config));
+$dependencies = $config['dependencies'];
+$dependencies['services']['config'] = $config;
+
+// Build container
+return new ServiceManager($dependencies);
