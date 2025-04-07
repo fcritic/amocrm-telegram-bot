@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Telegram\Service\Factory;
+namespace Telegram\Factory;
 
 use Exception;
 use Vjik\TelegramBot\Api\TelegramBotApi;

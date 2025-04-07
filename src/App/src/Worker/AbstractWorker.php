@@ -63,5 +63,5 @@ abstract class AbstractWorker implements QueueWorkerInterface
     }
 
     /** Обработка задачи */
-    abstract public function process(mixed $data, OutputInterface $output): void;
+    abstract public function process(array $data, OutputInterface $output): void;
 }

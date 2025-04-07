@@ -6,6 +6,8 @@ namespace Account;
 
 use Account\Repository\AccessTokenRepository;
 use Account\Repository\AccountRepository;
+use Account\Repository\Interface\AccessTokenRepositoryInterface;
+use Account\Repository\Interface\AccountRepositoryInterface;
 
 /**
  * ConfigProvider class
@@ -24,11 +26,10 @@ class ConfigProvider
     public function getDependencies(): array
     {
         return [
-            'invokables' => [
-                AccountRepository::class => AccountRepository::class,
-                AccessTokenRepository::class => AccessTokenRepository::class,
+            'aliases' => [
+                AccessTokenRepositoryInterface::class => AccessTokenRepository::class,
+                AccountRepositoryInterface::class => AccountRepository::class,
             ],
-            'factories' => [],
         ];
     }
 }

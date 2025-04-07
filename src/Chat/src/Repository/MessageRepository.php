@@ -7,6 +7,7 @@ namespace Chat\Repository;
 use Chat\Model\Message;
 use App\Repository\AbstractRepository;
 use Chat\Repository\Interface\MessageRepositoryInterface;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
  * Репозиторий для сообщения
@@ -40,9 +41,9 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
         int $telegramMessageId,
         string $type,
         string|null $content,
-        string|null $media,
-        string|null $fileName,
-        int|null $fileSize,
+        string|null $media = null,
+        string|null $fileName = null,
+        int|null $fileSize = null,
     ): int {
         /** @var Message $message */
         $message = $this->create([
@@ -59,6 +60,33 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
         return $message->id;
     }
 
+    public function updateMessage(
+        int $telegramMessageId,
+        string $type,
+        string|null $content,
+        string|null $media = null,
+        string|null $fileName = null,
+        int|null $fileSize = null,
+    ): int {
+        /** @var Message $messageId */
+        $messageId = $this->getBy('telegram_message_id', $telegramMessageId);
+
+        if ($messageId === null) {
+            throw new NotFoundResourceException('Message not found in database');
+        }
+
+        $this->update([
+            'telegram_message_id' => $telegramMessageId,
+            'type' => $type,
+            'content' => $content,
+            'media' => $media,
+            'file_name' => $fileName,
+            'file_size' => $fileSize,
+        ], $messageId->id);
+
+        return $messageId->id;
+    }
+
     /**
      * Получения токена тг бота по id файла на стороне интеграции
      * @param string $media
@@ -66,7 +94,7 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
      */
     public function getTokenByMedia(string $media): ?string
     {
-        return $this->query
+        return $this->query()
             ->with(['conversation.externalUser.account.telegramConnection'])
             ->where('media', $media)
             ->first()
@@ -75,5 +103,13 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
             ?->account
             ?->telegramConnection
             ?->token_bot;
+    }
+
+    public function getAmoMessageId(int $telegramMessageId): ?string
+    {
+        /** @var Message $massage */
+        $massage = $this->getBy('telegram_message_id', $telegramMessageId);
+
+        return $massage->amo_message_id ?? null;
     }
 }

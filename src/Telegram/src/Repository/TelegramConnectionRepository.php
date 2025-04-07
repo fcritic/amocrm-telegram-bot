@@ -29,8 +29,12 @@ class TelegramConnectionRepository extends AbstractRepository implements Telegra
      * @param string $webhookSecret Секретный ключ для хука тг бота
      * @return TelegramConnection
      */
-    public function updateOrCreateTelegram(int $accountId, string $botToken, string $webhookSecret): TelegramConnection
-    {
+    public function updateOrCreateTelegram(
+        int $accountId,
+        string $botToken,
+        string $webhookSecret,
+        string $usernameBot
+    ): TelegramConnection {
         /** @var TelegramConnection */
         return $this->updateOrCreate(
             ['account_id' => $accountId],
@@ -38,6 +42,7 @@ class TelegramConnectionRepository extends AbstractRepository implements Telegra
                 'account_id' => $accountId,
                 'token_bot' => $botToken,
                 'webhook_secret' => $webhookSecret,
+                'username_bot' => $usernameBot,
             ]
         );
     }
@@ -48,9 +53,17 @@ class TelegramConnectionRepository extends AbstractRepository implements Telegra
         return $this->getBy('token_bot', $token);
     }
 
-    public function getBySecret(string $webhookSecret): ?TelegramConnection
+    public function getSecret(string $webhookSecret): ?TelegramConnection
     {
         /** @var TelegramConnection */
         return $this->getBy('webhook_secret', $webhookSecret);
+    }
+
+    public function getAmoJoIdAndUsername(string $webhookSecret): ?TelegramConnection
+    {
+        return $this->query()
+            ->with('account')
+            ->where('webhook_secret', $webhookSecret)
+            ->first();
     }
 }

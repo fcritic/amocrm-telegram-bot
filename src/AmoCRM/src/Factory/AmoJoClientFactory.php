@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace AmoCRM\Service\Factory;
+namespace AmoCRM\Factory;
 
 use AmoJo\Client\AmoJoClient;
 use AmoJo\Models\Channel;
 use Doctrine\DBAL\ConnectionException;
-use Integration\Middleware\LoggerMiddleware;
+use Integration\Middleware\AmoJoLoggerMiddleware;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 
-class AmoJoClientFactory
+readonly class AmoJoClientFactory
 {
     /**
      * @throws ConnectionException
@@ -19,13 +19,16 @@ class AmoJoClientFactory
     public function __invoke(ContainerInterface $container): AmoJoClient
     {
         try {
-            return new AmoJoClient(
-                channel: $container->get(Channel::class),
-                additionalMiddleware: [LoggerMiddleware::class],
-                segment: $container->get('config')['amojo']['segment'],
-            );
+            $config = $container->get('config');
+            $channel = $container->get(Channel::class);
         } catch (ContainerExceptionInterface $e) {
             throw new ConnectionException($e->getMessage());
         }
+
+        return new AmoJoClient(
+            channel: $channel,
+            additionalMiddleware: $config['amojo']['middleware'],
+            segment: $config['amojo']['segment'],
+        );
     }
 }

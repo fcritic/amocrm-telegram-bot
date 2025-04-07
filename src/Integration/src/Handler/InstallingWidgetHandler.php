@@ -7,11 +7,13 @@ namespace Integration\Handler;
 use AmoCRM\Collections\SourcesCollection;
 use AmoCRM\Models\DisposableTokenModel;
 use AmoCRM\Models\SourceModel;
+use AmoCRM\OAuth\OAuthServiceInterface;
 use AmoCRM\Service\AmoJoClientService;
 use AmoCRM\Service\OAuthService;
 use App\Enum\ResponseMessage;
 use App\Enum\ResponseStatus;
 use App\Helper\Response;
+use Dot\DependencyInjection\Attribute\Inject;
 use Exception;
 use Integration\Service\DatabaseService;
 use Psr\Http\Message\ResponseInterface;
@@ -19,12 +21,22 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Telegram\Service\TelegramBotService;
 
-readonly class SettingsIntegrationHandler implements RequestHandlerInterface
+/**
+ * Хендлер для установки виджета в аккаунте. Получает запрос при сохранении настроек интеграции
+ */
+readonly class InstallingWidgetHandler implements RequestHandlerInterface
 {
+    #[Inject(
+        TelegramBotService::class,
+        DatabaseService::class,
+        OAuthService::class,
+        AmoJoClientService::class,
+        'config.amojo.channel_code'
+    )]
     public function __construct(
         protected TelegramBotService $botService,
         protected DatabaseService $dbService,
-        protected OAuthService $oauthService,
+        protected OAuthServiceInterface $oauthService,
         protected AmoJoClientService $amoJoClientService,
         protected string $channelCode,
     ) {

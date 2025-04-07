@@ -4,24 +4,11 @@ declare(strict_types=1);
 
 namespace Telegram;
 
-use Account\Repository\AccountRepository;
-use AmoCRM\OAuthConfig;
-use AmoCRM\Service\Factory\AmoCRMApiClientFactory;
-use GuzzleHttp\Client;
-use Integration\Handler\Factory\SettingsIntegrationHandlerFactory;
-use Integration\Handler\SettingsIntegrationHandler;
-use Integration\Middleware\SettingsIntegrationMiddleware;
-use Psr\Container\ContainerInterface;
-use Telegram\Handler\Factory\FileProxyHandlerFactory;
-use Telegram\Handler\Factory\TelegramWebhookHandlerFactory;
-use Telegram\Handler\FileProxyHandler;
-use Telegram\Handler\TelegramWebhookHandler;
-use Telegram\Middleware\TelegramWebhookMiddleware;
-use Telegram\Repository\TelegramRepository;
-use Telegram\Service\Factory\TelegramBotApiFactory;
-use Telegram\Service\FileService;
-use Telegram\Service\TelegramEventService;
-use Telegram\Service\TelegramSettingsService;
+use Dot\DependencyInjection\Factory\AttributedServiceFactory;
+use Telegram\Factory\TelegramBotApiFactory;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
+use Telegram\Repository\TelegramConnectionRepository;
+use Telegram\Service\TelegramBotService;
 
 /**
  * ConfigProvider class
@@ -40,26 +27,14 @@ class ConfigProvider
     public function getDependencies(): array
     {
         return [
+            'aliases' => [
+                TelegramConnectionRepositoryInterface::class => TelegramConnectionRepository::class,
+            ],
             'invokables' => [
-                TelegramRepository::class => TelegramRepository::class,
                 TelegramBotApiFactory::class => TelegramBotApiFactory::class,
             ],
             'factories' => [
-                TelegramEventService::class => function (ContainerInterface $container) {
-                    return new TelegramEventService(
-                        $container->get(TelegramBotApiFactory::class),
-                        $container->get(AccountRepository::class)
-                    );
-                },
-                FileService::class => function (ContainerInterface $container) {
-                    return new FileService(
-                        new Client(),
-                        $container->get(TelegramBotApiFactory::class),
-                        $container->get(TelegramRepository::class)
-                    );
-                },
-                TelegramWebhookHandler::class => TelegramWebhookHandlerFactory::class,
-                FileProxyHandler::class => FileProxyHandlerFactory::class,
+                TelegramBotService::class => AttributedServiceFactory::class,
             ],
         ];
     }

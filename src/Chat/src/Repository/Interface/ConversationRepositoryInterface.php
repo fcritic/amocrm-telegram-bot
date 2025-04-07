@@ -8,7 +8,7 @@ use Chat\Model\Conversation;
 
 interface ConversationRepositoryInterface
 {
-    public function getConversationById(string $conversationRefId): ?Conversation;
+    public function getConversationByTelegramId(string $telegramChatId): ?Conversation;
 
     public function createConversation(
         int $externalUserId,
@@ -24,7 +24,7 @@ interface ConversationRepositoryInterface
 
     public function firstOrCreateConversation(
         int $externalUserId,
-     int $telegramChatId,
-     string $amoChatId
+        int $telegramChatId,
+        string $amoChatId
     ): Conversation;
 }

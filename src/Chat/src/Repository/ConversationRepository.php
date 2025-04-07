@@ -21,10 +21,10 @@ class ConversationRepository extends AbstractRepository implements ConversationR
         return Conversation::class;
     }
 
-    public function getConversationById(string $amoChatId): ?Conversation
+    public function getConversationByTelegramId(string $telegramChatId): ?Conversation
     {
         /** @var Conversation */
-        return $this->getBy('amo_chat_id', $amoChatId);
+        return $this->getBy('telegram_chat_id', $telegramChatId);
     }
 
     /**
@@ -58,7 +58,7 @@ class ConversationRepository extends AbstractRepository implements ConversationR
     ): Conversation {
         /** @var Conversation */
         return $this->updateOrCreate(
-            ['external_user_id' => $externalUserId],
+            ['telegram_chat_id' => $telegramChatId],
             [
                 'external_user_id' => $externalUserId,
                 'telegram_chat_id' => $telegramChatId,
@@ -80,7 +80,7 @@ class ConversationRepository extends AbstractRepository implements ConversationR
     ): Conversation {
         /** @var Conversation */
         return $this->firstOrCreate(
-            ['amocrm_chat_id' => $amoChatId],
+            ['amo_chat_id' => $amoChatId],
             [
                 'external_user_id' => $externalUserId,
                 'telegram_chat_id' => $telegramChatId,

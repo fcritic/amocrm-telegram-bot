@@ -18,4 +18,6 @@ interface MessageRepositoryInterface
     ): int;
 
     public function getTokenByMedia(string $media): ?string;
+
+    public function getAmoMessageId(int $telegramMessageId): ?string;
 }

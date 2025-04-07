@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Account\Model;
 
+use Chat\Model\ExternalUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -68,5 +69,14 @@ class Account extends Model
     public function accessToken(): HasMany
     {
         return $this->hasMany(AccessToken::class);
+    }
+
+    /**
+     * Связь один ко многим
+     * @return HasMany
+     */
+    public function externalUser(): HasMany
+    {
+        return $this->hasMany(ExternalUser::class);
     }
 }

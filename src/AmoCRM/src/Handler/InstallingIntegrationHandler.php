@@ -16,7 +16,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Обработчик принимает вебхук об установки интеграции с кодом авторизации
  */
-readonly class OAuthAmoHandler implements RequestHandlerInterface
+readonly class InstallingIntegrationHandler implements RequestHandlerInterface
 {
     /**
      * @param OAuthService $oAuthServices

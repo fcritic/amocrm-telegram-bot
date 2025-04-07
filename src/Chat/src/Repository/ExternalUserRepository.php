@@ -81,8 +81,11 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
         string|null $profileLink = null
     ): ExternalUser {
         /** @var ExternalUser */
-        return $this->firstOrCreate(
-            ['amo_user_id' => $amoUserId],
+        return $this->updateOrCreate(
+            [
+                'amo_user_id' => $amoUserId,
+                'telegram_user_id' => $telegramUserId,
+            ],
             [
                 'account_id' => $accountId,
                 'amo_user_id' => $amoUserId,
@@ -103,7 +106,7 @@ class ExternalUserRepository extends AbstractRepository implements ExternalUserR
      */
     public function getTokenByAvatar(string $avatar): ?string
     {
-        return $this->query
+        return $this->query()
             ->with(['account.telegramConnection'])
             ->where('avatar', $avatar)
             ->first()

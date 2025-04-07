@@ -3,14 +3,18 @@
 namespace Integration\DTO;
 
 use AmoJo\Webhook\OutgoingMessageEvent;
+use Integration\Enum\EventType;
+use Vjik\TelegramBot\Api\Type\Message;
 
 readonly class AmoJoMessageData implements MessageDataInterface
 {
     /**
      * @param OutgoingMessageEvent $event
      */
-    public function __construct(protected OutgoingMessageEvent $event)
-    {
+    public function __construct(
+        protected OutgoingMessageEvent $event,
+        protected Message $message,
+    ) {
     }
 
     /**
@@ -22,6 +26,20 @@ readonly class AmoJoMessageData implements MessageDataInterface
             'type' => 'amojo_id',
             'value' => $this->event->getAccountUid()
         ];
+    }
+
+
+    public static function create(array $params): MessageDataInterface
+    {
+        return new self(
+            $params['event'],
+            $params['message']
+        );
+    }
+
+    public function getEvent(): EventType
+    {
+        return EventType::SEND_MESSAGE;
     }
 
     /**
@@ -45,7 +63,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
      */
     public function getAmoUserId(): ?string
     {
-        return $this->event->getReceiver()->getId();
+        return $this->event->getReceiver()->getRefId();
     }
 
     /**
@@ -53,7 +71,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
      */
     public function getExternalUserId(): ?string
     {
-        return $this->event->getReceiver()->getRefId();
+        return $this->event->getReceiver()->getId();
     }
 
     /**
@@ -101,7 +119,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
      */
     public function getExternalMessageId(): ?string
     {
-        return $this->event->getMessage()->getUid();
+        return $this->message?->messageId;
     }
 
     /**

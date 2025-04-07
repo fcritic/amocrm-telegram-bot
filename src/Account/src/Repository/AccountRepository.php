@@ -60,7 +60,7 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
      */
     public function getTelegramToken(string $amoJoId): ?string
     {
-        return $this->query
+        return $this->query()
             ->with('telegramConnection')
             ->where('amojo_id', $amoJoId)
             ->first()
@@ -75,7 +75,7 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
     public function getFieldsId(string $subDomain): array
     {
         /** @var Account $account */
-        $account = $this->query
+        $account = $this->query()
             ->with('accessToken:id,account_id')
             ->where('sub_domain', $subDomain)
             ->first(['id']);
@@ -84,5 +84,13 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
             'field_access_token_id' => $account?->getAttribute('accessToken')?->first()?->id,
             'field_account_id' => $account?->id,
         ];
+    }
+
+    public function getAccountAndTokens(int $amoAccountId): ?Account
+    {
+        return $this->query()
+            ->with('accessToken')
+            ->where('amo_account_id', $amoAccountId)
+            ->first();
     }
 }

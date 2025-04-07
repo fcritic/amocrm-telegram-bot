@@ -15,6 +15,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 readonly class TelegramWebhookHandler implements RequestHandlerInterface
 {
+    /**
+     * @param TelegramQueueProducer $producer
+     */
     public function __construct(protected TelegramQueueProducer $producer)
     {
     }
@@ -30,7 +33,7 @@ readonly class TelegramWebhookHandler implements RequestHandlerInterface
     {
         try {
             $this->producer->produce(data: [
-                'webhook_secret' => $request->getHeaderLine('X-TelegramConnection-Bot-Api-Secret-Token'),
+                'webhook_secret' => $request->getHeaderLine('X-Telegram-Bot-Api-Secret-Token'),
                 'body' => $request->getParsedBody(),
             ]);
         } catch (Exception $e) {

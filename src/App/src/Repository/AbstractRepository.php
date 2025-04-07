@@ -16,14 +16,18 @@ abstract class AbstractRepository implements RepositoryInterface
     /** @var Model Модель репозитория */
     protected Model $model;
 
-    /** @var Builder Запрос */
-    protected Builder $query;
-
     public function __construct()
     {
         $modelClass = $this->getModelClass();
-        $this->model = new $modelClass;
-        $this->query = $this->model->newQuery();
+        $this->model = new ($modelClass);
+    }
+
+    /**
+     * Создает новый экземпляр запроса
+     */
+    public function query(): Builder
+    {
+        return $this->model->newQuery();
     }
 
     /**
@@ -41,7 +45,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function getBy(string $field, mixed $value): ?Model
     {
-        return $this->query->where($field, $value)?->first();
+        return $this->query()->where($field, $value)?->first();
     }
 
     /**
@@ -50,7 +54,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function create(array $attributes): Model
     {
-        return $this->query->create($attributes);
+        return $this->query()->create($attributes);
     }
 
     /**
@@ -60,7 +64,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function firstOrCreate(array $attributes, array $values): Model
     {
-        return $this->query->firstOrCreate($attributes, $values);
+        return $this->query()->firstOrCreate($attributes, $values);
     }
 
     /**
@@ -70,7 +74,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function updateOrCreate(array $attributes, array $values): Model
     {
-        return $this->query->updateOrCreate($attributes, $values);
+        return $this->query()->updateOrCreate($attributes, $values);
     }
 
     /**
@@ -80,6 +84,6 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function update(array $attributes, int $id): bool
     {
-        return $this->query->findOrFail($id)?->update($attributes);
+        return $this->query()->findOrFail($id)?->update($attributes);
     }
 }
