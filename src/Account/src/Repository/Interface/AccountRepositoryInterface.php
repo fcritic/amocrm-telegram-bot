@@ -15,4 +15,6 @@ interface AccountRepositoryInterface
     public function getTelegramToken(string $amoJoId): ?string;
 
     public function getFieldsId(string $subDomain): array;
+
+    public function getAccountAndTokens(int $amoAccountId): ?Account;
 }
