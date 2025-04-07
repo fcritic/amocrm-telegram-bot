@@ -16,7 +16,7 @@ use Integration\DTO\AmoJoMessageData;
 use Integration\Service\DatabaseService;
 use JsonException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Telegram\Service\TelegramEventService;
+use Telegram\Service\TelegramBotService;
 use Throwable;
 
 class AmoJoQueueWorker extends AbstractWorker
@@ -27,7 +27,7 @@ class AmoJoQueueWorker extends AbstractWorker
     public function __construct(
         protected readonly BeanstalkConfig $beanstalk,
         protected readonly ParserWebHooks $parserWebHook,
-        protected readonly TelegramEventService $telegramService,
+        protected readonly TelegramBotService $telegramService,
         protected readonly DatabaseService $databaseService,
         protected readonly AmoJoClient $amoJoClient,
     ) {
@@ -41,21 +41,21 @@ class AmoJoQueueWorker extends AbstractWorker
      *
      * @throws JsonException
      */
-    public function process(mixed $data, OutputInterface $output): void
+    public function process(array $data, OutputInterface $output): void
     {
         $dto = $this->parserWebHook->parse($data['body']);
         try {
             $output->writeln('Processing webhook: ' . date("Y-m-d H:i:s"));
 
+            $output->writeln('Sending to telegram');
+            $message = $this->telegramService->sendEventTelegram($dto);
+
             if ($dto instanceof OutgoingMessageEvent) {
                 $output->writeln('Saving the event in the database');
-                $this->databaseService->saveDataMessage(dtoDb: new AmoJoMessageData($dto));
+                $this->databaseService->saveDataMessage(dtoDb: new AmoJoMessageData($dto, $message));
             }
-
-             $output->writeln('Sending to telegram');
-            $this->telegramService->sendEventTelegram($dto);
         } catch (Throwable $e) {
-            $output->writeln('Error send message: ' . $e->getMessage());
+            $output->writeln('Error send message: ' . $e->getMessage() . PHP_EOL . $e->getTraceAsString());
             $this->amoJoClient->deliverStatus(
                 $dto->getAccountUid(),
                 $dto->getMessage()->getRefUid(),
@@ -64,9 +64,5 @@ class AmoJoQueueWorker extends AbstractWorker
                     ->setErrorCode(ErrorCode::WITH_DESCRIPTION)
             );
         }
-//        catch (Exception $e) {
-//            $output->writeln('Error: ' . $e->getMessage());
-//            throw new JsonException($e->getMessage());
-//        }
     }
 }

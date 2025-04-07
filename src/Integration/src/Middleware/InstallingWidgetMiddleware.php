@@ -8,19 +8,17 @@ use AmoCRM\Exceptions\DisposableTokenExpiredException;
 use AmoCRM\Exceptions\DisposableTokenInvalidDestinationException;
 use AmoCRM\Exceptions\DisposableTokenVerificationFailedException;
 use AmoCRM\Factory\AmoCRMApiClientFactory;
-use App\Enum\ResponseMessage;
 use App\Enum\ResponseStatus;
 use App\Helper\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Telegram\Service\TelegramSettingsService;
 
 /**
  * Middleware валидирует хук при отправках токена для ТГ бота
  */
-readonly class SettingsIntegrationMiddleware implements MiddlewareInterface
+readonly class InstallingWidgetMiddleware implements MiddlewareInterface
 {
     public function __construct(protected AmoCRMApiClientFactory $amoCRMClientFactory)
     {
@@ -28,7 +26,7 @@ readonly class SettingsIntegrationMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request Запрос
-     * @param RequestHandlerInterface $handler SettingsIntegrationHandler
+     * @param RequestHandlerInterface $handler InstallingWidgetHandler
      * @return ResponseInterface ResponseInterface
      * @throws DisposableTokenInvalidDestinationException
      * @throws DisposableTokenExpiredException

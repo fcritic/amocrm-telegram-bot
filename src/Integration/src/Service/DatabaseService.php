@@ -18,7 +18,7 @@ use RuntimeException;
 use App\Exception\InvalidConversationOwnerException;
 use Telegram\Model\TelegramConnection;
 use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
-use Telegram\Service\TelegramSettingsService;
+use Telegram\Service\TelegramBotService;
 use Throwable;
 
 readonly class DatabaseService
@@ -44,6 +44,11 @@ readonly class DatabaseService
 
             if ($accountId === null) {
                 throw new RuntimeException('Account not found');
+            }
+
+            if ($dtoDb->getAmoUserId() === null) {
+                $this->updateMessage(dtoDb: $dtoDb);
+                return;
             }
 
             $externalUser = $this->saveExternalUser(accountId: $accountId, dtoDb: $dtoDb);
@@ -74,7 +79,7 @@ readonly class DatabaseService
     protected function saveConversation(ExternalUser $externalUser, MessageDataInterface $dtoDb): Conversation
     {
         /** @var Conversation $conversation */
-        $conversation = $this->conversationRepo->getConversationById($dtoDb->getAmoChatId());
+        $conversation = $this->conversationRepo->getConversationByTelegramId($dtoDb->getExternalChatId());
 
         if ($conversation === null || $conversation->external_user_id === $externalUser->id) {
             /** @var Conversation */
@@ -105,16 +110,29 @@ readonly class DatabaseService
         );
     }
 
+    protected function updateMessage(MessageDataInterface $dtoDb): void
+    {
+        $this->messageRepo->updateMessage(
+            telegramMessageId: (int) $dtoDb->getExternalMessageId(),
+            type: $dtoDb->getMessageType(),
+            content: $dtoDb->getMessageContent(),
+            media: $dtoDb->getMedia(),
+            fileName: $dtoDb->getFileName(),
+            fileSize: $dtoDb->getFileSize(),
+        );
+    }
+
     /**
      * @throws InvalidTokenOwnerException
      */
-    public function saveTelegramToken(string $token, string $accountId): void
+    public function saveTelegramToken(string $token, int $accountId, string $username): void
     {
         /** @var TelegramConnection|null $telegram */
         $telegram = $this->telegramRepo->getByToken($token);
 
+        /** TODO надо одним запросом получать */
         /** @var Account $account */
-        $account = $this->accountRepo->getAccountById((int) $accountId);
+        $account = $this->accountRepo->getAccountById($accountId);
 
         // Проверяем владельца существующего токена
         if (($telegram !== null) && $telegram->account_id !== $account->id) {
@@ -124,7 +142,8 @@ readonly class DatabaseService
         $this->telegramRepo->updateOrCreateTelegram(
             accountId: $account->id,
             botToken: $token,
-            webhookSecret: TelegramSettingsService::generateSecretToken($token)
+            webhookSecret: TelegramBotService::generateSecretToken($token),
+            usernameBot: $username,
         );
     }
 
@@ -133,7 +152,7 @@ readonly class DatabaseService
         /** @var TelegramConnection|Account $model */
         $model = match ($identifier['type']) {
             'amojo_id'       => $this->accountRepo->getBy($identifier['type'], $identifier['value']),
-            'webhook_secret' => $this->telegramRepo->getBySecret($identifier['value']),
+            'webhook_secret' => $this->telegramRepo->getSecret($identifier['value']),
             default          => null
         };
 

@@ -4,12 +4,24 @@ declare(strict_types=1);
 
 namespace Integration\DTO;
 
+use Integration\Enum\EventType;
+
 interface MessageDataInterface
 {
+    /**
+     * @return self
+     */
+    public static function create(array $params): self;
+
     /**
      * @return array
      */
     public function getAccountIdentifier(): array;
+
+    /**
+     * @return EventType
+     */
+    public function getEvent(): EventType;
 
     /**
      * @return string|null
@@ -89,5 +101,5 @@ interface MessageDataInterface
     /**
      * @return string|null
      */
-    public function getFileSize(): ?string;
+    public function getFileSize(): ?int;
 }
