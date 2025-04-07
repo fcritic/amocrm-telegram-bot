@@ -6,6 +6,9 @@ namespace Chat;
 
 use Chat\Repository\ConversationRepository;
 use Chat\Repository\ExternalUserRepository;
+use Chat\Repository\Interface\ConversationRepositoryInterface;
+use Chat\Repository\Interface\ExternalUserRepositoryInterface;
+use Chat\Repository\Interface\MessageRepositoryInterface;
 use Chat\Repository\MessageRepository;
 
 /**
@@ -25,12 +28,11 @@ class ConfigProvider
     public function getDependencies(): array
     {
         return [
-            'invokables' => [
-                ConversationRepository::class => ConversationRepository::class,
-                ExternalUserRepository::class => ExternalUserRepository::class,
-                MessageRepository::class => MessageRepository::class,
+            'aliases' => [
+                ConversationRepositoryInterface::class => ConversationRepository::class,
+                ExternalUserRepositoryInterface::class => ExternalUserRepository::class,
+                MessageRepositoryInterface::class => MessageRepository::class,
             ],
-            'factories' => [],
         ];
     }
 }
