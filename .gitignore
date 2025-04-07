@@ -7,5 +7,4 @@
 composer.lock
 .idea
 .env
-log/app.log
-
+logs/amojo.log
