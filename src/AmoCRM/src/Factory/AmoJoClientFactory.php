@@ -22,6 +22,7 @@ class AmoJoClientFactory
             return new AmoJoClient(
                 channel: $container->get(Channel::class),
                 additionalMiddleware: [LoggerMiddleware::class],
+                segment: $container->get('config')['amojo']['segment'],
             );
         } catch (ContainerExceptionInterface $e) {
             throw new ConnectionException($e->getMessage());

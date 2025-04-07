@@ -18,10 +18,11 @@ use RuntimeException;
 use Telegram\Service\Factory\TelegramBotApiFactory;
 use Vjik\TelegramBot\Api\FailResult;
 use Vjik\TelegramBot\Api\TelegramBotApi;
+use Vjik\TelegramBot\Api\Type\Message;
 use Vjik\TelegramBot\Api\Type\ReactionTypeEmoji;
 use Vjik\TelegramBot\Api\Type\ReplyParameters;
 
-class TelegramEventService
+class TelegramService
 {
     /** @var TelegramBotApi */
     protected TelegramBotApi $bot;
@@ -35,7 +36,7 @@ class TelegramEventService
     /**
      * @throws Exception
      */
-    public function sendEventTelegram(AbstractWebHookEvent $event): void
+    public function sendEventTelegram(AbstractWebHookEvent $event): Message|null
     {
         $token = $this->accountRepo->getTelegramToken(amoJoId: $event->getAccountUid());
 
@@ -46,18 +47,20 @@ class TelegramEventService
         $this->bot = $this->factoryBotApi->make(token: $token);
 
         match (true) {
-            $event instanceof OutgoingMessageEvent => $this->sendMessage($event),
+            $event instanceof OutgoingMessageEvent => $message = $this->sendMessage($event),
             $event instanceof TypingEvent          => $this->sendTyping($event),
             $event instanceof ReactionEvent        => $this->sendReaction($event),
         };
+
+        return $message ?? null;
     }
 
     /**
      * @param OutgoingMessageEvent $event
-     * @return void
+     * @return null
      * @throws RuntimeException
      */
-    protected function sendMessage(OutgoingMessageEvent $event): void
+    protected function sendMessage(OutgoingMessageEvent $event): Message|null
     {
         $chatId = $event->getConversation()->getId();
         $replyUid = (int) $event->getReplyTo()?->getReplyUid();
@@ -105,6 +108,8 @@ class TelegramEventService
         if ($result instanceof FailResult) {
             throw new RuntimeException($result->description, $result->response->statusCode);
         }
+
+        return $result ?? null;
     }
 
     protected function sendReaction(ReactionEvent $event): void
@@ -115,6 +120,7 @@ class TelegramEventService
             reaction: [new ReactionTypeEmoji($event->getEmoji())]
         );
     }
+
     protected function sendTyping(TypingEvent $event): void
     {
         $this->bot->sendChatAction(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmoCRM\Service\Factory;
 
+use AmoJo\Exception\AmoJoException;
 use AmoJo\Models\Channel;
 use Doctrine\DBAL\ConnectionException;
 use Psr\Container\ContainerExceptionInterface;
@@ -22,9 +23,16 @@ class AmoJoChannelFactory
             throw new ConnectionException($e->getMessage());
         }
 
+        $channelUid = $config['amojo']['channel_uid'];
+        $secretKey = $config['amojo']['secret_key'];
+
+        if (! isset($channelUid, $secretKey)) {
+            throw new AmoJoException('Please set amojo.channel_uid and amojo.secret_key in config');
+        }
+
         return new Channel(
-            uid: $config['amocrm']['amojo']['channel']['uid'],
-            secretKey: $config['amocrm']['amojo']['channel']['secret_key']
+            uid: $channelUid,
+            secretKey: $secretKey
         );
     }
 }

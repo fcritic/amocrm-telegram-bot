@@ -1,0 +1,78 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Integration\Handler;
+
+use AmoCRM\Collections\SourcesCollection;
+use AmoCRM\Models\DisposableTokenModel;
+use AmoCRM\Models\SourceModel;
+use AmoCRM\Service\AmoJoClientService;
+use AmoCRM\Service\OAuthService;
+use App\Enum\ResponseMessage;
+use App\Enum\ResponseStatus;
+use App\Helper\Response;
+use Exception;
+use Integration\Service\DatabaseService;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Telegram\Service\TelegramBotService;
+
+readonly class SettingsIntegrationHandler implements RequestHandlerInterface
+{
+    public function __construct(
+        protected TelegramBotService $botService,
+        protected DatabaseService $dbService,
+        protected OAuthService $oauthService,
+        protected AmoJoClientService $amoJoClientService,
+        protected string $channelCode,
+    ) {
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        /** @var DisposableTokenModel $disposableToken */
+        $disposableToken = $request->getAttribute('disposable_token');
+        $token = $request->getParsedBody()['telegram_token'];
+        $accountId = $disposableToken->getAccountId();
+
+        try {
+            if ($bot = $this->botService->setWebhook($token)) {
+                $this->dbService->saveTelegramToken($token, $accountId, $bot->username);
+
+                $amoCRMClient = $this->oauthService->getClient($accountId);
+
+                $amoCRMClient->setAccountBaseDomain(str_replace(
+                    'https://',
+                    '',
+                    $disposableToken->getAccountDomain()
+                ));
+
+                $sourcesCollection = new SourcesCollection();
+                $source = new SourceModel();
+                $source
+                    ->setName($bot->firstName)
+                    ->setOriginCode($this->channelCode)
+                    ->setExternalId($bot->username);
+
+                $sourcesCollection->add($source);
+                $sourcesService = $amoCRMClient->sources();
+
+                $sourcesService->add($sourcesCollection);
+
+                $this->amoJoClientService->connectChannel($request->getParsedBody()['account_uid']);
+            }
+        } catch (Exception $e) {
+            return new Response(
+                ResponseMessage::CHECK_TOKEN,
+                ResponseStatus::BAD_REQUEST,
+                $e->getMessage()
+            );
+        }
+        return new Response(ResponseMessage::SUCCESS, ResponseStatus::SUCCESS);
+    }
+}

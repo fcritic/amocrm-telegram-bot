@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Integration\Middleware;
 
 use AmoJo\Middleware\MiddlewareInterface;
+use App\Enum\ResponseStatus;
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
 use JsonException;
@@ -13,22 +14,17 @@ use Monolog\Logger;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Throwable;
 
 final class LoggerMiddleware implements MiddlewareInterface
 {
     private LoggerInterface $logger;
-    private bool $logBody;
-    private int $maxBodyLength;
 
     public function __construct(
-        bool $logBody = true,
-        int $maxBodyLength = 2000
+        private readonly bool $logBody = true,
+        private readonly int $maxBodyLength = 2000
     ) {
         $this->logger = new Logger('amoJo');
-        $this->logBody = $logBody;
-        $this->maxBodyLength = $maxBodyLength;
-        $this->logger->pushHandler(new StreamHandler('/var/www/application/log/app.log'));
+        $this->logger->pushHandler(new StreamHandler('/var/www/application/logs/amojo.log'));
     }
 
     public function __invoke(callable $handler): Closure
@@ -41,25 +37,16 @@ final class LoggerMiddleware implements MiddlewareInterface
             $promise = $handler($request, $options);
 
             return $promise->then(
-                $this->handleSuccess($request, $startTime),
-                $this->handleFailure($request, $startTime)
+                $this->handle($request, $startTime)
             );
         };
     }
 
-    private function handleSuccess(RequestInterface $request, float $startTime): callable
+    private function handle(RequestInterface $request, float $startTime): callable
     {
         return function (ResponseInterface $response) use ($request, $startTime) {
             $this->logResponse($request, $response, $startTime);
             return $response;
-        };
-    }
-
-    private function handleFailure(RequestInterface $request, float $startTime): callable
-    {
-        return function (Throwable $exception) use ($request, $startTime) {
-            $this->logError($request, $exception, $startTime);
-            throw $exception;
         };
     }
 
@@ -88,7 +75,7 @@ final class LoggerMiddleware implements MiddlewareInterface
             'status' => $response->getStatusCode(),
             'duration' => round(microtime(true) - $startTime, 3),
             'request_method' => $request->getMethod(),
-            'request_uri' => (string)$request->getUri(),
+            'request_uri' => (string) $request->getUri(),
             'headers' => $response->getHeaders(),
         ];
 
@@ -97,24 +84,12 @@ final class LoggerMiddleware implements MiddlewareInterface
             $context['body'] = $this->parseJsonBody($body);
         }
 
-        $this->logger->info('HTTP Response', $context);
-    }
+        $logLevel = match ($response->getStatusCode()) {
+            ResponseStatus::SUCCESS->value, ResponseStatus::NO_CONTENT->value => 'info',
+            default => 'error',
+        };
 
-    private function logError(
-        RequestInterface $request,
-        Throwable $error,
-        float $startTime
-    ): void {
-        $context = [
-            'message' => $error->getMessage(),
-            'code' => $error->getCode(),
-            'duration' => round(microtime(true) - $startTime, 3),
-            'request_method' => $request->getMethod(),
-            'request_uri' => (string)$request->getUri(),
-            'trace' => $error->getTraceAsString(),
-        ];
-
-        $this->logger->error('HTTP Error', $context);
+        $this->logger->{$logLevel}('HTTP Response', $context);
     }
 
     private function truncateBody(string $body): string

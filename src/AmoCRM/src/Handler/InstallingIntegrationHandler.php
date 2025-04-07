@@ -9,7 +9,7 @@ use AmoCRM\Service\OAuthService;
 use App\Enum\ResponseMessage;
 use App\Enum\ResponseStatus;
 use App\Helper\Response;
-use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -21,24 +21,25 @@ readonly class OAuthAmoHandler implements RequestHandlerInterface
     /**
      * @param OAuthService $oAuthServices
      */
-    public function __construct(
-        protected OAuthService $oAuthServices,
-    ) {
+    public function __construct(protected OAuthService $oAuthServices)
+    {
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @return JsonResponse
+     * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): JsonResponse
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        /** @psalm-var array<string, string> $params */
         $params = $request->getQueryParams();
 
         if (! isset($params['code'], $params['referer'])) {
-            return new JsonResponse(['message' => 'Invalid webhook authorization code'], 400);
+            return new Response(ResponseMessage::INVALID_AUTHORIZATION_CODE);
         }
 
         try {
+            /** Отдает параметры хука об установки для получения пары токенов */
             $this->oAuthServices->process(params: $params);
         } catch (AmoCRMApiException $e) {
             return new Response($e->getMessage(), ResponseStatus::BAD_REQUEST);
