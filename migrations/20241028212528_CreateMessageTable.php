@@ -20,8 +20,8 @@ class CreateMessageTable extends Migration
             $table->bigInteger('telegram_message_id')->comment('ID сообщения в TelegramConnection');
             $table->string('type');
             $table->text('content')->charset('utf8mb4')->nullable()->comment('Текст сообщения');
-            $table->string('media',210)->nullable();
-            $table->string('file_name',210)->nullable();
+            $table->string('media', 210)->nullable();
+            $table->string('file_name', 210)->nullable();
             $table->integer('file_size')->nullable();
             $table->timestamps();
 
