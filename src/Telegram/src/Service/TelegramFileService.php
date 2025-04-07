@@ -6,20 +6,20 @@ namespace Telegram\Service;
 
 use Chat\Repository\Interface\ExternalUserRepositoryInterface;
 use Chat\Repository\Interface\MessageRepositoryInterface;
+use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
-use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
-use Telegram\Repository\TelegramConnectionRepository;
-use Telegram\Service\Factory\TelegramBotApiFactory;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use GuzzleHttp\Exception\GuzzleException;
-use Exception;
+use Telegram\Factory\TelegramBotApiFactory;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
+use Vjik\TelegramBot\Api\FailResult;
+use Vjik\TelegramBot\Api\Type\UserProfilePhotos;
 
-readonly class FileService
+readonly class TelegramFileService
 {
     public function __construct(
-        protected Client $client,
         protected TelegramBotApiFactory $botFactory,
         protected ExternalUserRepositoryInterface $externalUserRepo,
         protected MessageRepositoryInterface $messageRepo,
@@ -44,20 +44,36 @@ readonly class FileService
         }
 
         $bot = $this->botFactory->make($token);
-        $fileUrl = $bot->makeFileUrl($bot->getFile($fileId));
+        $file = $bot->getFile($fileId);
 
-        return $this->client->get($fileUrl, ['stream' => true]);
+        if ($file instanceof FailResult) {
+            throw new RuntimeException($file->description);
+        }
+
+        $fileUrl = $bot->makeFileUrl($file);
+
+        return (new Client())->get($fileUrl, [
+            'stream' => true,
+            'timeout' => 6,
+        ]);
     }
 
     /**
      * @throws Exception
      */
-    public function getFileId(int $telegramUserId, string $webhookSecret): string
+    public function getAvatarFileId(int $telegramUserId, string $webhookSecret): ?string
     {
-        $token = $this->telegramRepo->getBySecret($webhookSecret)->token_bot;
+        $token = $this->telegramRepo->getSecret($webhookSecret)->token_bot;
         $bot = $this->botFactory->make($token);
+        $userProfilePhotos = $bot->getUserProfilePhotos($telegramUserId);
 
-        return $bot->getUserProfilePhotos($telegramUserId)->photos[0][2]->fileId;
+        if ($userProfilePhotos instanceof UserProfilePhotos) {
+            if ($userProfilePhotos->totalCount <= 0) {
+                return null;
+            }
+            return $userProfilePhotos?->photos[0][2]?->fileId;
+        }
+        return null;
     }
 
     protected function getTokenByAvatar(string $fileId): ?string

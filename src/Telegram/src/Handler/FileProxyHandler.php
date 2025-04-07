@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Telegram\Handler;
 
+use App\Enum\ResponseStatus;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
@@ -11,14 +12,14 @@ use Laminas\Diactoros\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Telegram\Service\FileService;
+use Telegram\Service\TelegramFileService;
 
 readonly class FileProxyHandler implements RequestHandlerInterface
 {
     /**
-     * @param FileService $fileService
+     * @param TelegramFileService $fileService
      */
-    public function __construct(protected FileService $fileService)
+    public function __construct(protected TelegramFileService $fileService,)
     {
     }
 
@@ -48,7 +49,7 @@ readonly class FileProxyHandler implements RequestHandlerInterface
                 ])
             );
         } catch (Exception $e) {
-            return new \App\Helper\Response($e->getMessage());
+            return new \App\Helper\Response($e->getMessage(), ResponseStatus::NO_CONTENT);
         }
     }
 }

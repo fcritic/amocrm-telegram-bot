@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $account_id
  * @property string $token_bot
  * @property string $webhook_secret
+ * @property string $username_bot
  */
 class TelegramConnection extends Model
 {
@@ -38,6 +39,7 @@ class TelegramConnection extends Model
         'account_id',
         'token_bot',
         'webhook_secret',
+        'username_bot',
     ];
 
     /**

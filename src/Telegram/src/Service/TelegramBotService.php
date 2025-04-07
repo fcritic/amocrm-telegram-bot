@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Telegram\Service;
 
+use Account\Repository\AccountRepository;
 use Account\Repository\Interface\AccountRepositoryInterface;
 use AmoJo\Enum\MessageType;
 use AmoJo\Enum\WebHookType;
@@ -12,25 +13,96 @@ use AmoJo\Webhook\OutgoingMessageEvent;
 use AmoJo\Webhook\ReactionEvent;
 use AmoJo\Webhook\TypingEvent;
 use App\Exception\NotFountTokenException;
+use Dot\DependencyInjection\Attribute\Inject;
 use Exception;
 use InvalidArgumentException;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
-use Telegram\Service\Factory\TelegramBotApiFactory;
+use Telegram\Factory\TelegramBotApiFactory;
+use Telegram\Model\TelegramConnection;
+use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Vjik\TelegramBot\Api\FailResult;
 use Vjik\TelegramBot\Api\TelegramBotApi;
 use Vjik\TelegramBot\Api\Type\Message;
 use Vjik\TelegramBot\Api\Type\ReactionTypeEmoji;
 use Vjik\TelegramBot\Api\Type\ReplyParameters;
+use Vjik\TelegramBot\Api\Type\User;
 
-class TelegramService
+class TelegramBotService
 {
     /** @var TelegramBotApi */
     protected TelegramBotApi $bot;
 
+    /**
+     * @param TelegramBotApiFactory $factoryBotApi
+     * @param AccountRepositoryInterface $accountRepo
+     * @param TelegramConnectionRepositoryInterface $telegramRepo
+     * @param array $externalGateway
+     */
+    #[Inject(
+        TelegramBotApiFactory::class,
+        AccountRepository::class,
+        TelegramConnectionRepositoryInterface::class,
+        'config.external_gateway'
+    )]
     public function __construct(
         protected readonly TelegramBotApiFactory $factoryBotApi,
-        protected readonly AccountRepositoryInterface $accountRepo
+        protected readonly AccountRepositoryInterface $accountRepo,
+        protected readonly TelegramConnectionRepositoryInterface $telegramRepo,
+        protected readonly array $externalGateway
     ) {
+    }
+
+    /**
+     * Настройка вебхука тг бота
+     *
+     * @param string $token токен ТГ бота
+     * @return User|null
+     * @throws Exception
+     */
+    public function setWebhook(string $token): ?User
+    {
+        $telegramBot = $this->factoryBotApi->make($token);
+
+        $setWebhook = $telegramBot->setWebhook(
+            url: $this->externalGateway['telegram_url'],
+            allowUpdates: [
+                'message',
+                'edited_message',
+                'message_reaction',
+            ],
+            secretToken: static::generateSecretToken($token)
+        );
+
+        if ($setWebhook) {
+            return $telegramBot->getMe();
+        }
+        return null;
+    }
+
+    /**
+     * Генерация секретного токена для заголовков хука от тг бота
+     *
+     * @param string $botToken токен ТГ бота
+     * @return string секретный токен для заголовка ``X-Telegram-Bot-Api-Secret-Token``
+     */
+    public static function generateSecretToken(string $botToken): string
+    {
+        return Uuid::uuid5(ns: Uuid::NAMESPACE_DNS, name: $botToken)->toString();
+    }
+
+    /**
+     * Валидация хука сообщения
+     *
+     * @param string $secretHeader получение секретного токена из заголовков запроса хука
+     * @return bool ответ при валидации хука
+     */
+    public function isValidWebhook(string $secretHeader): bool
+    {
+        /** @var TelegramConnection $secret */
+        $secret = $this->telegramRepo->getSecret($secretHeader);
+
+        return hash_equals($secret->webhook_secret, $secretHeader);
     }
 
     /**
