@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
+use Dot\DependencyInjection\Attribute\Inject;
 use Pheanstalk\Pheanstalk;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class BeanstalkConfig
 {
@@ -16,19 +16,16 @@ class BeanstalkConfig
      * Конфиг который создает коннект с сервером очередей.
      * Параметры конфигурации получающие из контейнера зависимости
      *
-     * @param ContainerInterface $container контейнер зависимостей
+     * @param array $configBeanstalk
      */
-    public function __construct(ContainerInterface $container)
+    #[Inject('config.beanstalk')]
+    public function __construct(readonly protected array $configBeanstalk)
     {
-        try {
-            $this->connection = Pheanstalk::create(
-                $container->get('config')['beanstalk']['host'],
-                $container->get('config')['beanstalk']['port'],
-                $container->get('config')['beanstalk']['timeout']
-            );
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            exit('BeanstalkConfig ' . $e->getMessage());
-        }
+        $this->connection = Pheanstalk::create(
+            $configBeanstalk['host'],
+            $configBeanstalk['port'],
+            $configBeanstalk['timeout']
+        );
     }
 
     /** Коннект */

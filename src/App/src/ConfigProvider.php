@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Database\BootstrapperInterface;
 use App\Database\DatabaseBootstrapper;
-use App\Middleware\DatabaseInitMiddleware;
-use Psr\Container\ContainerInterface;
+use Dot\DependencyInjection\Factory\AttributedServiceFactory;
+use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 
 /**
  * ConfigProvider class
@@ -25,17 +26,15 @@ class ConfigProvider
     public function getDependencies(): array
     {
         return [
-            'invokables' => [],
+            'abstract_factories' => [
+                ReflectionBasedAbstractFactory::class,
+            ],
+            'aliases' => [
+                BootstrapperInterface::class => DatabaseBootstrapper::class,
+            ],
             'factories' => [
-                DatabaseBootstrapper::class => static function (ContainerInterface $container) {
-                    return new DatabaseBootstrapper($container);
-                },
-                DatabaseInitMiddleware::class => static function ($container) {
-                    return new DatabaseInitMiddleware($container->get(DatabaseBootstrapper::class));
-                },
-                BeanstalkConfig::class => static function (ContainerInterface $container) {
-                    return new BeanstalkConfig($container);
-                }
+                DatabaseBootstrapper::class => AttributedServiceFactory::class,
+                BeanstalkConfig::class => AttributedServiceFactory::class,
             ],
         ];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Database;
 
 use Doctrine\DBAL\ConnectionException;
+use Dot\DependencyInjection\Attribute\Inject;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -15,15 +16,15 @@ class DatabaseBootstrapper implements BootstrapperInterface
     private static bool $isBootstrapped = false;
 
     /**
-     * @param ContainerInterface $container
+     * @param array $configDatabase
      */
-    public function __construct(protected readonly ContainerInterface $container)
+    #[Inject('config.database')]
+    public function __construct(protected readonly array $configDatabase)
     {
     }
 
     /**
      * @return void
-     * @throws ConnectionException
      */
     public function bootstrap(): void
     {
@@ -31,14 +32,8 @@ class DatabaseBootstrapper implements BootstrapperInterface
             return;
         }
 
-        try {
-            $config = $this->container->get('config')['database'];
-        } catch (ContainerExceptionInterface $e) {
-            throw new ConnectionException($e->getMessage());
-        }
-
         $capsule = new Capsule();
-        $capsule->addConnection($config);
+        $capsule->addConnection($this->configDatabase);
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
 
