@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Helper\ConfigLoader;
 use Mezzio\Application;
 use Mezzio\MiddlewareFactory;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Dotenv\Dotenv;
 
 // Delegate static file requests back to the PHP built-in webserver
 if (
@@ -27,7 +27,8 @@ require 'vendor/autoload.php';
     $container = require 'config/container.php';
 
     // Загрузка ENV
-    ConfigLoader::load();
+    $dotenv = new Dotenv();
+    $dotenv->load('.env');
 
     /** @var Application $app */
     $app = $container->get(Application::class);
