@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace AmoCRM;
 
 use AmoCRM\OAuth\OAuthConfigInterface;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
+use Dot\DependencyInjection\Attribute\Inject;
 
 class OAuthConfig implements OAuthConfigInterface
 {
@@ -20,18 +19,14 @@ class OAuthConfig implements OAuthConfigInterface
     protected string $redirectUri;
 
     /**
-     * @param ContainerInterface $container
+     * @param array $configAmoCRM
      */
-    public function __construct(
-        protected readonly ContainerInterface $container,
-    ) {
-        try {
-            $this->clientId = $this->container->get('config')['amocrm']['client_id'];
-            $this->clientSecret = $this->container->get('config')['amocrm']['client_secret'];
-            $this->redirectUri = $this->container->get('config')['amocrm']['redirect_uri'];
-        } catch (ContainerExceptionInterface $e) {
-            exit('OAuthConfig ' . $e->getMessage());
-        }
+    #[Inject('config.amocrm')]
+    public function __construct(protected readonly array $configAmoCRM)
+    {
+        $this->clientId = $configAmoCRM['client_id'];
+        $this->clientSecret = $configAmoCRM['client_secret'];
+        $this->redirectUri = $configAmoCRM['redirect_uri'];
     }
 
     public function getIntegrationId(): string

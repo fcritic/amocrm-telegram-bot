@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AmoCRM\Service\Factory;
+namespace AmoCRM\Factory;
 
 use AmoJo\Exception\AmoJoException;
 use AmoJo\Models\Channel;
@@ -10,7 +10,7 @@ use Doctrine\DBAL\ConnectionException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 
-class AmoJoChannelFactory
+readonly class AmoJoChannelFactory
 {
     /**
      * @throws ConnectionException

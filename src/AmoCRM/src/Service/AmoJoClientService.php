@@ -6,6 +6,7 @@ namespace AmoCRM\Service;
 
 use AmoCRM\Factory\MessageFactory;
 use AmoCRM\Factory\SenderFactory;
+use AmoCRM\Service\MessageProcessor\ReactHandler;
 use AmoCRM\Service\MessageProcessor\ReplyToHandler;
 use AmoJo\Client\AmoJoClient;
 use AmoJo\DTO\AbstractResponse;
@@ -25,7 +26,7 @@ use RuntimeException;
 use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Vjik\TelegramBot\Api\Type\Update\Update;
 
-class AmoJoService
+class AmoJoClientService
 {
     protected Update $event;
     protected TelegramMessageData $messageData;
@@ -52,13 +53,6 @@ class AmoJoService
 
         $this->event = $event;
         $this->messageData = $messageData;
-
-        /**
-        'action' => [
-            'react' => $event->messageReaction?->newReaction[0]->toRequestArray()['emoji'],
-            'unreact' => $event->messageReaction?->oldReaction[0]->toRequestArray(),
-        ];
-         */
 
         return match ($messageData->getEvent()) {
             EventType::SEND_MESSAGE => $this->sendMessage($account['amojo_id'], $account['external_id']),
@@ -105,7 +99,10 @@ class AmoJoService
     {
         $payload = $this->createPayload(
             (string) $this->event->message->chat->id,
-            $this->senderFactory->create($this->event->message->from, $this->messageData->getExternalUserAvatar()),
+            $this->senderFactory->create(
+                $this->event->message->from,
+                $this->messageData->getExternalUserAvatar()
+            ),
             $this->messageFactory->createMessage($this->event, $this->messageData)
         );
 
@@ -131,9 +128,35 @@ class AmoJoService
         return $this->amoJoClient->editMessage($amoJoId, $payload);
     }
 
+    /**
+     * @throws Exception
+     */
     private function sendReaction(string $amoJoId): ?ReactResponse
     {
-        return null;
+        $react = $this->event->messageReaction;
+        $message = $this->messageFactory->createMessage($this->event, $this->messageData);
+        $amoJoRefId = $this->messageRepo->getAmoMessageId((int) $message->getUid());
+        $type = true;
+
+        if (empty($react->newReaction)) {
+            $type = false;
+            $emoji = $react?->oldReaction[0]?->toRequestArray()['emoji'];
+        } else {
+            $emoji = $react?->newReaction[0]?->toRequestArray()['emoji'];
+        }
+
+        if ($amoJoRefId !== null) {
+            $message->setRefUid($amoJoRefId);
+        }
+
+        return $this->amoJoClient->react(
+            $amoJoId,
+            (new Conversation())->setId((string) $react->chat->id),
+            $this->senderFactory->create($react->user),
+            $message,
+            $emoji,
+            $type
+        );
     }
 
     public function connectChannel(string $amoJoId): ConnectResponse

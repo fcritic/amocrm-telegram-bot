@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace AmoCRM\Service\Factory;
+namespace AmoCRM\Factory;
 
 use AmoCRM\Client\AmoCRMApiClient;
 use AmoCRM\OAuth\OAuthConfigInterface;
 
-class AmoCRMApiClientFactory
+readonly class AmoCRMApiClientFactory
 {
     /**
      * AmoCRMApiClientFactory constructor.

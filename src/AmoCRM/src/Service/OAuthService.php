@@ -10,10 +10,9 @@ use AmoCRM\Client\AmoCRMApiClient;
 use AmoCRM\Exceptions\AmoCRMApiException;
 use AmoCRM\Exceptions\AmoCRMMissedTokenException;
 use AmoCRM\Exceptions\AmoCRMoAuthApiException;
+use AmoCRM\Factory\AmoCRMApiClientFactory;
 use AmoCRM\Models\AccountModel;
 use AmoCRM\OAuth\OAuthServiceInterface;
-use AmoCRM\Service\Factory\AmoCRMApiClientFactory;
-use Illuminate\Database\Eloquent\Model;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 
@@ -114,17 +113,18 @@ class OAuthService implements OAuthServiceInterface
         );
     }
 
-    public function getClient(): AmoCRMApiClient
+    public function getClient(int $accountId): AmoCRMApiClient
     {
-        /** @var \Account\Model\AccessToken $accessToken */
-        $accessToken = $this->accessTokenRepo->getBy('account_id', '1');
+        $query = $this->accountRepo->getAccountAndTokens($accountId);
+
+        $accessToken = $query?->getAttribute('accessToken')->first();
+        $subDomain = $query?->sub_domain;
+
         $this->client->setAccessToken(new AccessToken([
             'access_token' => $accessToken->access_token,
             'refresh_token' => $accessToken->refresh_token,
             'expires' => $accessToken->expires,
         ]));
-
-        $this->client->setAccountBaseDomain('test1484.amocrm.ru');
 
         return $this->client;
     }

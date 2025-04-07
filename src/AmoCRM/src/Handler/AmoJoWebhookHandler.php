@@ -19,7 +19,7 @@ use AmoJo\Exception\InvalidRequestWebHookException;
 use AmoJo\Exception\UnsupportedMessageTypeException;
 
 /**
- * Принимает вебхуки из amoCRM на события исходящего сообщения от пользователя
+ * Обработчик принимает вебхук на исходящие сообщения в канал чатов из интерфейса amoCRM
  */
 readonly class AmoJoWebhookHandler implements RequestHandlerInterface
 {
@@ -39,7 +39,9 @@ readonly class AmoJoWebhookHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
+            /** @psalm-var array<string, string|array> $body */
             $body = (array) $request->getParsedBody();
+
             $type = match (true) {
                 isset($body['message']) => WebHookType::MESSAGE,
                 isset($body['action']['reaction']) => WebHookType::REACTION,
@@ -47,6 +49,7 @@ readonly class AmoJoWebhookHandler implements RequestHandlerInterface
                 default => throw new UnsupportedMessageTypeException()
             };
 
+            /** Валидация структуры вебхука из amoJo */
             $this->validateStructure(
                 data: $body,
                 requiredFields: $this->getValidationRules($type),

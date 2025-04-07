@@ -10,7 +10,7 @@ use AmoJo\Webhook\ValidatorWebHooks;
 use App\Enum\ResponseMessage;
 use App\Enum\ResponseStatus;
 use App\Helper\Response;
-use Laminas\Diactoros\Response\JsonResponse;
+use Dot\DependencyInjection\Attribute\Inject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -19,13 +19,14 @@ use RuntimeException;
 use Throwable;
 
 /**
- * Middleware валидирует хук при отправке исходящего сообщения из amoCRM
+ * Middleware валидирует вебхук на исходящие сообщения в канал чатов из интерфейса amoCRM
  */
 readonly class AmoJoWebhookMiddleware implements MiddlewareInterface
 {
     /**
      * @param string $secret
      */
+    #[Inject('config.amojo.secret_key')]
     public function __construct(protected string $secret)
     {
     }
@@ -38,11 +39,11 @@ readonly class AmoJoWebhookMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            if (! ValidatorWebHooks::isValid($request, $this->secret) && ! $request->hasHeader(HeaderType::SIGNATURE)) {
-                return new Response(ResponseMessage::INVALID_REQUEST, ResponseStatus::BAD_REQUEST);
+            if (! ValidatorWebHooks::isValid($request, $this->secret) || ! $request->hasHeader(HeaderType::SIGNATURE)) {
+                return new Response(ResponseMessage::INVALID_SIGNATURE, ResponseStatus::UNAUTHORIZED);
             }
         } catch (InvalidRequestWebHookException $e) {
-            return new JsonResponse(['message' => $e->getMessage()]);
+            return new Response(ResponseMessage::INVALID_REQUEST);
         } catch (Throwable $e) {
             throw new RuntimeException($e->getMessage());
         }

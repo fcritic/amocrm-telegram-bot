@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace AmoCRM\Service;
 
-class AmoCRMEventService
+class AmoCRMService
 {
 }
