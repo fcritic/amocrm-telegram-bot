@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Chat\Repository;
+namespace Integration\Repository;
 
-use Chat\Model\Message;
 use App\Repository\AbstractRepository;
-use Chat\Repository\Interface\MessageRepositoryInterface;
+use Integration\Model\Message;
+use Integration\Repository\Interface\MessageRepositoryInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**

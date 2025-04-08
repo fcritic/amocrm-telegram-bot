@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Telegram\Service;
 
-use Chat\Repository\Interface\ExternalUserRepositoryInterface;
-use Chat\Repository\Interface\MessageRepositoryInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Integration\Repository\Interface\ExternalUserRepositoryInterface;
+use Integration\Repository\Interface\MessageRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;

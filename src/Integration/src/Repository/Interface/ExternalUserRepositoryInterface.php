@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Chat\Repository\Interface;
+namespace Integration\Repository\Interface;
 
-use Chat\Model\ExternalUser;
+use Integration\Model\ExternalUser;
 
 interface ExternalUserRepositoryInterface
 {

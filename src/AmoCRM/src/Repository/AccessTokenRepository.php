@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Account\Repository;
+namespace AmoCRM\Repository;
 
-use Account\Model\AccessToken;
-use Account\Repository\Interface\AccessTokenRepositoryInterface;
+use AmoCRM\Model\AccessToken;
+use AmoCRM\Repository\Interface\AccessTokenRepositoryInterface;
 use App\Repository\AbstractRepository;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 

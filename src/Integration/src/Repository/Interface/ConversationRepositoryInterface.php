@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Chat\Repository\Interface;
+namespace Integration\Repository\Interface;
 
-use Chat\Model\Conversation;
+use Integration\Model\Conversation;
 
 interface ConversationRepositoryInterface
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Chat\Repository;
+namespace Integration\Repository;
 
-use Chat\Model\Conversation;
 use App\Repository\AbstractRepository;
-use Chat\Repository\Interface\ConversationRepositoryInterface;
+use Integration\Model\Conversation;
+use Integration\Repository\Interface\ConversationRepositoryInterface;
 
 /**
  * Репозиторий для чата

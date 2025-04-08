@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AmoCRM\Service;
 
-use Account\Repository\Interface\AccessTokenRepositoryInterface;
-use Account\Repository\Interface\AccountRepositoryInterface;
 use AmoCRM\Client\AmoCRMApiClient;
 use AmoCRM\Exceptions\AmoCRMApiException;
 use AmoCRM\Exceptions\AmoCRMMissedTokenException;
@@ -13,6 +11,8 @@ use AmoCRM\Exceptions\AmoCRMoAuthApiException;
 use AmoCRM\Factory\AmoCRMApiClientFactory;
 use AmoCRM\Models\AccountModel;
 use AmoCRM\OAuth\OAuthServiceInterface;
+use AmoCRM\Repository\Interface\AccessTokenRepositoryInterface;
+use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 

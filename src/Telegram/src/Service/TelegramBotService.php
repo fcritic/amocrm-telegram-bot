@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Telegram\Service;
 
-use Account\Repository\AccountRepository;
-use Account\Repository\Interface\AccountRepositoryInterface;
+use AmoCRM\Repository\AccountRepository;
+use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use AmoJo\Enum\MessageType;
 use AmoJo\Enum\WebHookType;
 use AmoJo\Webhook\AbstractWebHookEvent;

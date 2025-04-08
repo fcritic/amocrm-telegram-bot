@@ -2,31 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Chat\Model;
+namespace Integration\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Модель сообщения
+ * Модель Чата
  *
  * @property int $id
- * @property int $conversation_id
- * @property string $amo_message_id
- * @property int $telegram_message_id
- * @property string $type
- * @property string $content
- * @property string $media
- * @property string $file_name
- * @property int $file_size
+ * @property int $external_user_id
+ * @property int $telegram_chat_id
+ * @property string $amo_chat_id
  */
-class Message extends Model
+class Conversation extends Model
 {
     /**
      * Таблица связанная с моделью
      * @var string
      */
-    protected $table = 'message';
+    protected $table = 'conversation';
 
     /**
      * Указывает, что временные метки created_at/updated_at должны использоваться
@@ -39,14 +35,9 @@ class Message extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'conversation_id',
-        'amo_message_id',
-        'telegram_message_id',
-        'type',
-        'content',
-        'media',
-        'file_name',
-        'file_size',
+        'external_user_id',
+        'telegram_chat_id',
+        'amo_chat_id',
     ];
 
     /**
@@ -54,17 +45,25 @@ class Message extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'conversation_id' => 'integer',
-        'telegram_message_id' => 'integer',
-        'file_size' => 'integer',
+        'external_user_id' => 'integer',
+        'telegram_chat_id' => 'integer',
     ];
 
     /**
      * Таблица принадлежит к таблице
      * @return BelongsTo
      */
-    public function conversation(): BelongsTo
+    public function externalUser(): BelongsTo
     {
-        return $this->belongsTo(Conversation::class);
+        return $this->belongsTo(ExternalUser::class);
+    }
+
+    /**
+     * Связь один ко многим
+     * @return HasMany
+     */
+    public function message(): HasMany
+    {
+        return $this->hasMany(Message::class);
     }
 }

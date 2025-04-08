@@ -8,6 +8,12 @@ use Dot\DependencyInjection\Factory\AttributedServiceFactory;
 use Integration\Command\AmoJoQueueWorkerCommand;
 use Integration\Command\TelegramQueueWorkerCommand;
 use Integration\Handler\InstallingWidgetHandler;
+use Integration\Repository\ConversationRepository;
+use Integration\Repository\ExternalUserRepository;
+use Integration\Repository\Interface\ConversationRepositoryInterface;
+use Integration\Repository\Interface\ExternalUserRepositoryInterface;
+use Integration\Repository\Interface\MessageRepositoryInterface;
+use Integration\Repository\MessageRepository;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -27,6 +33,11 @@ class ConfigProvider
     public function getDependencies(): array
     {
         return [
+            'aliases' => [
+                ConversationRepositoryInterface::class => ConversationRepository::class,
+                ExternalUserRepositoryInterface::class => ExternalUserRepository::class,
+                MessageRepositoryInterface::class => MessageRepository::class,
+            ],
             'factories' => [
                 AmoJoQueueWorkerCommand::class => static function (ContainerInterface $container) {
                     return new AmoJoQueueWorkerCommand($container);

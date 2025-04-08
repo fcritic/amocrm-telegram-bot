@@ -2,27 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Account\Model;
+namespace Integration\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Модель токена доступа
+ * Модель сообщения
  *
  * @property int $id
- * @property int $account_id
- * @property string $access_token
- * @property string $refresh_token
- * @property int $expires
+ * @property int $conversation_id
+ * @property string $amo_message_id
+ * @property int $telegram_message_id
+ * @property string $type
+ * @property string $content
+ * @property string $media
+ * @property string $file_name
+ * @property int $file_size
  */
-class AccessToken extends Model
+class Message extends Model
 {
     /**
      * Таблица связанная с моделью
      * @var string
      */
-    protected $table = 'access_token';
+    protected $table = 'message';
 
     /**
      * Указывает, что временные метки created_at/updated_at должны использоваться
@@ -35,10 +39,14 @@ class AccessToken extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'account_id',
-        'access_token',
-        'refresh_token',
-        'expires',
+        'conversation_id',
+        'amo_message_id',
+        'telegram_message_id',
+        'type',
+        'content',
+        'media',
+        'file_name',
+        'file_size',
     ];
 
     /**
@@ -46,16 +54,17 @@ class AccessToken extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'account_id' => 'integer',
-        'expires' => 'integer',
+        'conversation_id' => 'integer',
+        'telegram_message_id' => 'integer',
+        'file_size' => 'integer',
     ];
 
     /**
      * Таблица принадлежит к таблице
      * @return BelongsTo
      */
-    public function account(): BelongsTo
+    public function conversation(): BelongsTo
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(Conversation::class);
     }
 }

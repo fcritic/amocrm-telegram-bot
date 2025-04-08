@@ -10,6 +10,10 @@ use AmoCRM\Factory\MessageFactory;
 use AmoCRM\Factory\SenderFactory;
 use AmoCRM\Middleware\AmoJoWebhookMiddleware;
 use AmoCRM\OAuth\OAuthConfigInterface;
+use AmoCRM\Repository\AccessTokenRepository;
+use AmoCRM\Repository\AccountRepository;
+use AmoCRM\Repository\Interface\AccessTokenRepositoryInterface;
+use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use AmoJo\Client\AmoJoClient;
 use AmoJo\Models\Channel;
 use AmoJo\Webhook\ParserWebHooks;
@@ -33,6 +37,8 @@ class ConfigProvider
     {
         return [
             'aliases' => [
+                AccessTokenRepositoryInterface::class => AccessTokenRepository::class,
+                AccountRepositoryInterface::class => AccountRepository::class,
                 OAuthConfigInterface::class => OAuthConfig::class,
             ],
             'invokables' => [

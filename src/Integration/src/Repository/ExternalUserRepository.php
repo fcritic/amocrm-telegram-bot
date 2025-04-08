@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Chat\Repository;
+namespace Integration\Repository;
 
-use Chat\Model\ExternalUser;
 use App\Repository\AbstractRepository;
-use Chat\Repository\Interface\ExternalUserRepositoryInterface;
+use Integration\Model\ExternalUser;
+use Integration\Repository\Interface\ExternalUserRepositoryInterface;
 
 /**
  * Репозиторий для внешнего пользователя

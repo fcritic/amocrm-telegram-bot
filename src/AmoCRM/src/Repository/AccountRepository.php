@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Account\Repository;
+namespace AmoCRM\Repository;
 
-use Account\Model\Account;
-use Account\Repository\Interface\AccountRepositoryInterface;
+use AmoCRM\Model\Account;
+use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use App\Repository\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
 

@@ -2,27 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Chat\Model;
+namespace Integration\Model;
 
+use AmoCRM\Model\Account;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Модель Чата
+ * Модель Контакта
  *
  * @property int $id
- * @property int $external_user_id
- * @property int $telegram_chat_id
- * @property string $amo_chat_id
+ * @property int $account_id
+ * @property string $amo_user_id
+ * @property int $telegram_user_id
+ * @property string $username
+ * @property string $name
+ * @property string $phone
+ * @property string $avatar
+ * @property string $profile_link
  */
-class Conversation extends Model
+class ExternalUser extends Model
 {
     /**
      * Таблица связанная с моделью
      * @var string
      */
-    protected $table = 'conversation';
+    protected $table = 'external_user';
 
     /**
      * Указывает, что временные метки created_at/updated_at должны использоваться
@@ -35,9 +41,14 @@ class Conversation extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'external_user_id',
-        'telegram_chat_id',
-        'amo_chat_id',
+        'account_id',
+        'amo_user_id',
+        'telegram_user_id',
+        'username',
+        'name',
+        'phone',
+        'avatar',
+        'profile_link',
     ];
 
     /**
@@ -45,25 +56,25 @@ class Conversation extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'external_user_id' => 'integer',
-        'telegram_chat_id' => 'integer',
+        'account_id' => 'integer',
+        'telegram_user_id' => 'integer'
     ];
 
     /**
      * Таблица принадлежит к таблице
      * @return BelongsTo
      */
-    public function externalUser(): BelongsTo
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(ExternalUser::class);
+        return $this->belongsTo(Account::class);
     }
 
     /**
      * Связь один ко многим
      * @return HasMany
      */
-    public function message(): HasMany
+    public function conversation(): HasMany
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Conversation::class);
     }
 }

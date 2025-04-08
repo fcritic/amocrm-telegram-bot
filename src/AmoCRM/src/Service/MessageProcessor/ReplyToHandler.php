@@ -6,7 +6,7 @@ namespace AmoCRM\Service\MessageProcessor;
 
 use AmoJo\Models\Messages\ReplyTo;
 use AmoJo\Models\Payload;
-use Chat\Repository\Interface\MessageRepositoryInterface;
+use Integration\Repository\Interface\MessageRepositoryInterface;
 use Vjik\TelegramBot\Api\Type\Update\Update;
 
 readonly class ReplyToHandler

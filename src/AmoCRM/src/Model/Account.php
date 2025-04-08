@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Account\Model;
+namespace AmoCRM\Model;
 
-use Chat\Model\ExternalUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Integration\Model\ExternalUser;
 use Telegram\Model\TelegramConnection;
 
 /**

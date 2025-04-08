@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Chat\Repository\Interface;
+namespace Integration\Repository\Interface;
 
 interface MessageRepositoryInterface
 {

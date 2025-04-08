@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Account\Repository\Interface;
+namespace AmoCRM\Repository\Interface;
 
-use Account\Model\Account;
+use AmoCRM\Model\Account;
 
 interface AccountRepositoryInterface
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Telegram\Model;
 
-use Account\Model\Account;
+use AmoCRM\Model\Account;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
