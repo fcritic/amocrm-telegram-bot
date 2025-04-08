@@ -21,10 +21,8 @@ $aggregator = new ConfigAggregator([
     \Mezzio\Router\ConfigProvider::class,
     \Laminas\Diactoros\ConfigProvider::class,
 
-    Account\ConfigProvider::class,
     AmoCRM\ConfigProvider::class,
     App\ConfigProvider::class,
-    Chat\ConfigProvider::class,
     Telegram\ConfigProvider::class,
     Integration\ConfigProvider::class,
 
