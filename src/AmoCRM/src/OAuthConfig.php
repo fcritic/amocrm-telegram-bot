@@ -7,6 +7,9 @@ namespace AmoCRM;
 use AmoCRM\OAuth\OAuthConfigInterface;
 use Dot\DependencyInjection\Attribute\Inject;
 
+/**
+ * Конфиг интеграции
+ */
 readonly class OAuthConfig implements OAuthConfigInterface
 {
     /** @var string */
@@ -29,16 +32,25 @@ readonly class OAuthConfig implements OAuthConfigInterface
         $this->redirectUri = $configAmoCRM['redirect_uri'];
     }
 
+    /**
+     * @return string
+     */
     public function getIntegrationId(): string
     {
         return $this->clientId;
     }
 
+    /**
+     * @return string
+     */
     public function getSecretKey(): string
     {
         return $this->clientSecret;
     }
 
+    /**
+     * @return string
+     */
     public function getRedirectDomain(): string
     {
         return $this->redirectUri;

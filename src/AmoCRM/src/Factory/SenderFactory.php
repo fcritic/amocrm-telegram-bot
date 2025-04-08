@@ -18,6 +18,11 @@ readonly class SenderFactory
     }
 
     /**
+     * Создает внешнего юзера для отправки в amoJo по данным из телеграм
+     *
+     * @param User $user
+     * @param string|null $avatarFileId
+     * @return Sender
      * @throws Exception
      */
     public function create(User $user, ?string $avatarFileId = null): Sender
@@ -43,13 +48,18 @@ readonly class SenderFactory
         return $sender;
     }
 
+    /**
+     * @param User $user
+     * @return string|null
+     */
     private function buildProfileLink(User $user): ?string
     {
         return "https://t.me/{$user->username}" ?? null;
     }
 
     /**
-     * @throws Exception
+     * @param string $avatarFileId
+     * @return string|null
      */
     private function buildAvatarUrl(string $avatarFileId): ?string
     {

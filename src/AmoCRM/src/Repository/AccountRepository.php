@@ -46,6 +46,8 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
     }
 
     /**
+     * Получение модели аккаунта по id аккаунта
+     *
      * @param int $amoAccountId
      * @return Model|null
      */
@@ -55,6 +57,8 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
     }
 
     /**
+     * Получение токена телеграмм по amojo_id аккаунта
+     *
      * @param string $amoJoId amoJoId аккаунта (ID аккаунта на стороне API чатов)
      * @return string|null
      */
@@ -69,6 +73,8 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
     }
 
     /**
+     * Получение локальных id записей из таблиц access_token и account
+     *
      * @param string $subDomain
      * @return array<string, int> возвращает локальный id моделей из таблиц
      */
@@ -86,8 +92,17 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
         ];
     }
 
+    /**
+     * Получение аккаунта и его токена по id аккаунта.
+     * Данный запрос выполняется только в случае валидации пользователя по токену отправленный из-под фронтенда amoCRM
+     * @link https://www.amocrm.ru/developers/content/oauth/disposable-tokens
+     *
+     * @param int $amoAccountId
+     * @return Account|null
+     */
     public function getAccountAndTokens(int $amoAccountId): ?Account
     {
+        /** @var Account */
         return $this->query()
             ->with('accessToken')
             ->where('amo_account_id', $amoAccountId)

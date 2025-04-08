@@ -15,6 +15,11 @@ readonly class ReplyToHandler
     {
     }
 
+    /**
+     * @param Payload $payload
+     * @param Update $event
+     * @return void
+     */
     public function handle(Payload $payload, Update $event): void
     {
         if (! $event->message?->replyToMessage) {

@@ -16,15 +16,18 @@ use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 
-class OAuthService implements OAuthServiceInterface
+/**
+ * Класс для работы с авторизации amoCRM
+ */
+readonly class OAuthService implements OAuthServiceInterface
 {
     /** @var AmoCRMApiClient  */
     protected AmoCRMApiClient $client;
 
     public function __construct(
-        protected readonly AccessTokenRepositoryInterface $accessTokenRepo,
-        protected readonly AccountRepositoryInterface $accountRepo,
-        protected readonly AmoCRMApiClientFactory $factoryClient,
+        protected AccessTokenRepositoryInterface $accessTokenRepo,
+        protected AccountRepositoryInterface $accountRepo,
+        protected AmoCRMApiClientFactory $factoryClient,
     ) {
         $this->client = $this->factoryClient->make();
         $this->client->onAccessTokenRefresh(
@@ -35,6 +38,8 @@ class OAuthService implements OAuthServiceInterface
     }
 
     /**
+     * Процесс получения хук при установках интеграции с кодом авторизации и получения пары токенов
+     *
      * @param array<string, string> $params
      * @return void
      * @throws AmoCRMApiException
@@ -50,6 +55,8 @@ class OAuthService implements OAuthServiceInterface
     }
 
     /**
+     * Обмен кода авторизации на пару токенов
+     *
      * @param string $subDomain
      * @param string $code
      * @return AccessTokenInterface
@@ -73,6 +80,8 @@ class OAuthService implements OAuthServiceInterface
     }
 
     /**
+     * Сохранение токенов в базу
+     *
      * @param AccessTokenInterface $accessToken
      * @param string $baseDomain
      * @return void
@@ -97,6 +106,8 @@ class OAuthService implements OAuthServiceInterface
     }
 
     /**
+     * СОхранения аккаунта в базу
+     *
      * @return void
      * @throws AmoCRMApiException
      * @throws AmoCRMoAuthApiException
@@ -113,12 +124,17 @@ class OAuthService implements OAuthServiceInterface
         );
     }
 
+    /**
+     * Получения клиента по ID аккаунта amoCRM
+     *
+     * @param int $accountId
+     * @return AmoCRMApiClient
+     */
     public function getClient(int $accountId): AmoCRMApiClient
     {
         $query = $this->accountRepo->getAccountAndTokens($accountId);
 
         $accessToken = $query?->getAttribute('accessToken')->first();
-        $subDomain = $query?->sub_domain;
 
         $this->client->setAccessToken(new AccessToken([
             'access_token' => $accessToken->access_token,

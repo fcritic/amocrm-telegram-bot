@@ -13,7 +13,7 @@ use Dot\DependencyInjection\Attribute\Inject;
  *
  * Большинство параметров находится в массиве канала чатов который выдают при регистрации канала чатов
  */
-class AmoJoConfig
+readonly class AmoJoConfig
 {
     /** @var string секретный ключ канала чатов */
     public string $secretKey;

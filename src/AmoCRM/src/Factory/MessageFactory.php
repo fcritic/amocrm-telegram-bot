@@ -17,6 +17,13 @@ class MessageFactory extends BaseMessageFactory
     {
     }
 
+    /**
+     * Создает сообщение для amoJo из данных телеграмм
+     *
+     * @param Update $event
+     * @param TelegramMessageData $messageData
+     * @return MessageInterface
+     */
     public function createMessage(Update $event, TelegramMessageData $messageData): MessageInterface
     {
         return $this->create($this->buildData($event, $messageData));

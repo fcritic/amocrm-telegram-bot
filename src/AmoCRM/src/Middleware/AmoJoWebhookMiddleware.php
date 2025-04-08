@@ -20,6 +20,7 @@ use Throwable;
 
 /**
  * Middleware валидирует вебхук на исходящие сообщения в канал чатов из интерфейса amoCRM
+ * по сигнатуре с использованием секретного ключа канала чатов
  */
 readonly class AmoJoWebhookMiddleware implements MiddlewareInterface
 {

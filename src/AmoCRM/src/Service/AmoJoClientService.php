@@ -6,7 +6,6 @@ namespace AmoCRM\Service;
 
 use AmoCRM\Factory\MessageFactory;
 use AmoCRM\Factory\SenderFactory;
-use AmoCRM\Service\MessageProcessor\ReactHandler;
 use AmoCRM\Service\MessageProcessor\ReplyToHandler;
 use AmoJo\Client\AmoJoClient;
 use AmoJo\DTO\AbstractResponse;
@@ -24,33 +23,44 @@ use Exception;
 use Integration\DTO\TelegramMessageData;
 use Integration\Enum\EventType;
 use Integration\Repository\Interface\MessageRepositoryInterface;
-use RuntimeException;
 use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Vjik\TelegramBot\Api\Type\Update\Update;
 
-class AmoJoClientService
+/**
+ * Обертка для AmoJoClient
+ */
+readonly class AmoJoClientService
 {
+    /** @var Update */
     protected Update $event;
+
+    /** @var TelegramMessageData */
     protected TelegramMessageData $messageData;
 
     public function __construct(
-        protected readonly AmoJoClient $amoJoClient,
-        protected readonly TelegramConnectionRepositoryInterface $telegramRepo,
-        protected readonly MessageRepositoryInterface $messageRepo,
-        protected readonly MessageFactory $messageFactory,
-        protected readonly SenderFactory $senderFactory,
-        protected readonly ReplyToHandler $replyTo,
+        protected AmoJoClient $amoJoClient,
+        protected TelegramConnectionRepositoryInterface $telegramRepo,
+        protected MessageRepositoryInterface $messageRepo,
+        protected MessageFactory $messageFactory,
+        protected SenderFactory $senderFactory,
+        protected ReplyToHandler $replyTo,
     ) {
     }
 
     /**
-     * Основной метод обработки событий
-     * @throws NotFountAmoJoIdException|RuntimeException|Exception
+     * Основной метод обработки событий:
+     * - Отправка сообщения
+     * - Редактирования сообщения
+     * - Реакция на сообщения
+     *
+     * @param Update $event
+     * @param TelegramMessageData $messageData
+     * @return AbstractResponse
+     * @throws NotFountAmoJoIdException
+     * @throws Exception
      */
-    public function sendEventAmoJo(
-        Update $event,
-        TelegramMessageData $messageData
-    ): AbstractResponse {
+    public function sendEventAmoJo(Update $event, TelegramMessageData $messageData): AbstractResponse
+    {
         $account = $this->getAccountData($messageData->getAccountIdentifier()['value']);
 
         $this->event = $event;
@@ -65,6 +75,9 @@ class AmoJoClientService
 
     /**
      * Получение данных аккаунта с валидацией
+     *
+     * @param string $webhookSecret
+     * @return array
      * @throws NotFountAmoJoIdException
      */
     private function getAccountData(string $webhookSecret): array
@@ -85,6 +98,11 @@ class AmoJoClientService
 
     /**
      * Фабрика создания Payload
+     *
+     * @param string $chatId
+     * @param Sender $sender
+     * @param MessageInterface $message
+     * @return Payload
      */
     private function createPayload(string $chatId, Sender $sender, MessageInterface $message): Payload
     {
@@ -95,6 +113,9 @@ class AmoJoClientService
     }
 
     /**
+     * @param string $amoJoId
+     * @param string $externalId
+     * @return MessageResponse
      * @throws Exception
      */
     protected function sendMessage(string $amoJoId, string $externalId): MessageResponse
@@ -114,6 +135,8 @@ class AmoJoClientService
     }
 
     /**
+     * @param string $amoJoId
+     * @return MessageResponse
      * @throws Exception
      */
     private function sendEditMessage(string $amoJoId): MessageResponse
@@ -131,6 +154,8 @@ class AmoJoClientService
     }
 
     /**
+     * @param string $amoJoId
+     * @return ReactResponse|null
      * @throws Exception
      */
     private function sendReaction(string $amoJoId): ?ReactResponse
@@ -185,6 +210,10 @@ class AmoJoClientService
         );
     }
 
+    /**
+     * @param string $amoJoId
+     * @return ConnectResponse
+     */
     public function connectChannel(string $amoJoId): ConnectResponse
     {
         return $this->amoJoClient->connect($amoJoId);
