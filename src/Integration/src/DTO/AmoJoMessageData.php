@@ -165,7 +165,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
     /**
      * @return string|null
      */
-    public function getFileSize(): ?string
+    public function getFileSize(): ?int
     {
         return $this->event->getMessage()->getFileSize();
     }

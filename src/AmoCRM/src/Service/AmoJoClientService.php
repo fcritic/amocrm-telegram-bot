@@ -11,9 +11,11 @@ use AmoCRM\Service\MessageProcessor\ReplyToHandler;
 use AmoJo\Client\AmoJoClient;
 use AmoJo\DTO\AbstractResponse;
 use AmoJo\DTO\ConnectResponse;
+use AmoJo\DTO\DeliveryResponse;
 use AmoJo\DTO\MessageResponse;
 use AmoJo\DTO\ReactResponse;
 use AmoJo\Models\Conversation;
+use AmoJo\Models\Deliver;
 use AmoJo\Models\Interfaces\MessageInterface;
 use AmoJo\Models\Payload;
 use AmoJo\Models\Users\Sender;
@@ -156,6 +158,30 @@ class AmoJoClientService
             $message,
             $emoji,
             $type
+        );
+    }
+
+    /**
+     * @param string $amoJoId
+     * @param string $messageRefId
+     * @param int $status
+     * @param string $message
+     * @param int $errorCode
+     * @return DeliveryResponse
+     */
+    public function updateStatus(
+        string $amoJoId,
+        string $messageRefId,
+        int $status,
+        string $message,
+        int $errorCode
+    ): DeliveryResponse {
+        return $this->amoJoClient->deliverStatus(
+            $amoJoId,
+            $messageRefId,
+            (new Deliver($status))
+                ->setMessageError($message)
+                ->setErrorCode($errorCode)
         );
     }
 
