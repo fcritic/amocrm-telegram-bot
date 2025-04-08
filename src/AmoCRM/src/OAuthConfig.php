@@ -7,7 +7,7 @@ namespace AmoCRM;
 use AmoCRM\OAuth\OAuthConfigInterface;
 use Dot\DependencyInjection\Attribute\Inject;
 
-class OAuthConfig implements OAuthConfigInterface
+readonly class OAuthConfig implements OAuthConfigInterface
 {
     /** @var string */
     protected string $clientId;
@@ -22,7 +22,7 @@ class OAuthConfig implements OAuthConfigInterface
      * @param array $configAmoCRM
      */
     #[Inject('config.amocrm')]
-    public function __construct(protected readonly array $configAmoCRM)
+    public function __construct(protected array $configAmoCRM)
     {
         $this->clientId = $configAmoCRM['client_id'];
         $this->clientSecret = $configAmoCRM['client_secret'];

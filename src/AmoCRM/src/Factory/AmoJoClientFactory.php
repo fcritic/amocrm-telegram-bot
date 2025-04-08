@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace AmoCRM\Factory;
 
+use AmoCRM\AmoJoConfig;
 use AmoJo\Client\AmoJoClient;
-use AmoJo\Models\Channel;
-use Doctrine\DBAL\ConnectionException;
-use Integration\Middleware\AmoJoLoggerMiddleware;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 readonly class AmoJoClientFactory
 {
     /**
-     * @throws ConnectionException
+     * @param AmoJoConfig $config
+     * @return AmoJoClient
      */
     public function __invoke(ContainerInterface $container): AmoJoClient
     {
         try {
-            $config = $container->get('config');
-            $channel = $container->get(Channel::class);
+            /** @var AmoJoConfig $config */
+            $config = $container->get(AmoJoConfig::class);
         } catch (ContainerExceptionInterface $e) {
-            throw new ConnectionException($e->getMessage());
+            throw new NotFoundResourceException($e->getMessage());
         }
 
         return new AmoJoClient(
-            channel: $channel,
-            additionalMiddleware: $config['amojo']['middleware'],
-            segment: $config['amojo']['segment'],
+            channel: $config->getChannel(),
+            additionalMiddleware: $config->middleware,
+            segment: $config->segment,
         );
     }
 }
