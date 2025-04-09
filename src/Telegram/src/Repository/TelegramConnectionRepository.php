@@ -61,6 +61,7 @@ class TelegramConnectionRepository extends AbstractRepository implements Telegra
 
     public function getAmoJoIdAndUsername(string $webhookSecret): ?TelegramConnection
     {
+        /** @var TelegramConnection */
         return $this->query()
             ->with('account')
             ->where('webhook_secret', $webhookSecret)

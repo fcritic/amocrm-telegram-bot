@@ -29,7 +29,7 @@ use Vjik\TelegramBot\Api\Type\Update\Update;
 /**
  * Обертка для AmoJoClient
  */
-readonly class AmoJoClientService
+class AmoJoClientService
 {
     /** @var Update */
     protected Update $event;

@@ -6,6 +6,9 @@ namespace Integration\DTO;
 
 use Integration\Enum\EventType;
 
+/**
+ * Интерфейс для передачи DTO в сервис базы
+ */
 interface MessageDataInterface
 {
     /**

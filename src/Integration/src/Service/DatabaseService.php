@@ -21,6 +21,12 @@ use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Telegram\Service\TelegramBotService;
 use Throwable;
 
+/**
+ * Сервис для комплексной работы с данными в БД:
+ * - Сохранение цепочек сообщений (пользователи → диалоги → сообщения)
+ * - Управление Telegram-токенами
+ * - Транзакционная обработка данных
+ */
 readonly class DatabaseService
 {
     public function __construct(
@@ -33,8 +39,17 @@ readonly class DatabaseService
     }
 
     /**
-     * @throws InvalidConversationOwnerException
+     * Сохраняет полный контекст сообщения в транзакции:
+     * 1. Находит аккаунт по идентификатору из DTO
+     * 2. Сохраняет/обновляет внешнего пользователя
+     * 3. Создает или обновляет диалог с проверкой владельца
+     * 4. Сохраняет метаданные сообщения
+     *
+     * @param MessageDataInterface $dtoDb
+     * @return void
      * @throws Throwable
+     * @throws InvalidConversationOwnerException Если диалог принадлежит другому пользователю
+     * @throws RuntimeException Если аккаунт не найден
      */
     public function saveDataMessage(MessageDataInterface $dtoDb): void
     {
@@ -58,6 +73,15 @@ readonly class DatabaseService
         });
     }
 
+    /**
+     *  Сохраняет/обновляет профиль внешнего пользователя:
+     *  - Привязка к аккаунту amoCRM
+     *  - Синхронизация данных Telegram
+     *
+     * @param int $accountId
+     * @param MessageDataInterface $dtoDb
+     * @return ExternalUser
+     */
     protected function saveExternalUser(int $accountId, MessageDataInterface $dtoDb): ExternalUser
     {
         /** @var ExternalUser */
@@ -74,6 +98,14 @@ readonly class DatabaseService
     }
 
     /**
+     *  Управление диалогами:
+     *  - Создает новый диалог, если не существует
+     *  - Обновляет привязку к amoCRM, если диалог принадлежит текущему пользователю
+     *  - Блокирует изменение чужого диалога
+     *
+     * @param ExternalUser $externalUser
+     * @param MessageDataInterface $dtoDb
+     * @return Conversation
      * @throws InvalidConversationOwnerException
      */
     protected function saveConversation(ExternalUser $externalUser, MessageDataInterface $dtoDb): Conversation
@@ -96,6 +128,16 @@ readonly class DatabaseService
         );
     }
 
+    /**
+     *  Сохраняет метаданные сообщения:
+     *  - Привязка к диалогу
+     *  - Ссылки на сообщения в amoCRM и Telegram
+     *  - Тип и содержимое сообщения
+     *
+     * @param Conversation $conversation
+     * @param MessageDataInterface $dtoDb
+     * @return void
+     */
     protected function saveMessage(Conversation $conversation, MessageDataInterface $dtoDb): void
     {
         $this->messageRepo->createMessage(
@@ -110,6 +152,13 @@ readonly class DatabaseService
         );
     }
 
+    /**
+     *  Обновляет существующее сообщение:
+     *  - Используется когда AmoCRM user не определен (системные сообщения)
+     *
+     * @param MessageDataInterface $dtoDb
+     * @return void
+     */
     protected function updateMessage(MessageDataInterface $dtoDb): void
     {
         $this->messageRepo->updateMessage(
@@ -123,14 +172,22 @@ readonly class DatabaseService
     }
 
     /**
-     * @throws InvalidTokenOwnerException
+     *  Привязывает Telegram-бот к аккаунту:
+     *  - Генерирует секрет для вебхука
+     *  - Проверяет права на токен
+     *  - Обновляет или создает подключение
+     *
+     * @param string $token
+     * @param int $accountId
+     * @param string $username
+     * @return void
+     * @throws InvalidTokenOwnerException При попытке перехвата чужого токена
      */
     public function saveTelegramToken(string $token, int $accountId, string $username): void
     {
         /** @var TelegramConnection|null $telegram */
         $telegram = $this->telegramRepo->getByToken($token);
 
-        /** TODO надо одним запросом получать */
         /** @var Account $account */
         $account = $this->accountRepo->getAccountById($accountId);
 
@@ -147,6 +204,14 @@ readonly class DatabaseService
         );
     }
 
+    /**
+     *  Универсальный поиск аккаунта по идентификатору:
+     *  - Поддерживает поиск по amojo_id и webhook_secret
+     *  - Возвращает ID аккаунта или null
+     *
+     * @param array $identifier
+     * @return int|null
+     */
     protected function getByIdentifier(array $identifier): ?int
     {
         /** @var TelegramConnection|Account $model */

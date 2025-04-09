@@ -24,6 +24,8 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * Создает новый экземпляр запроса
+     *
+     * @return Builder
      */
     public function query(): Builder
     {
@@ -31,6 +33,8 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * Возвращает FQCN класса модели для создания запроса из репозитория
+     *
      * @return string
      */
     abstract public function getModelClass(): string;

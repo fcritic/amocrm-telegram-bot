@@ -29,6 +29,8 @@ return static function (Application $app, MiddlewareFactory $factory, ContainerI
 
     // Конект с базой
     $app->pipe(DatabaseInitMiddleware::class);
+
+    // Парсит запрос
     $app->pipe(BodyParamsMiddleware::class);
 
     // Pipe more middleware here that you want to execute on every request:

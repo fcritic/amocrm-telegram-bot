@@ -12,6 +12,9 @@ use Pheanstalk\Pheanstalk;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+/**
+ * Базовый воркер
+ */
 abstract class AbstractWorker implements QueueWorkerInterface
 {
     /** @var Pheanstalk Текущее подключение к серверу очередей */
@@ -20,7 +23,6 @@ abstract class AbstractWorker implements QueueWorkerInterface
     /** @var string Просматриваемая очередь */
     protected string $queue = 'default';
 
-    /** Constructor AbstractWorker */
     public function __construct(BeanstalkConfig $beanstalk)
     {
         $this->connection = $beanstalk->getConnection();

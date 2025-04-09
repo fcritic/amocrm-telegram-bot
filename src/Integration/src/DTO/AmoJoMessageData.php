@@ -10,6 +10,7 @@ readonly class AmoJoMessageData implements MessageDataInterface
 {
     /**
      * @param OutgoingMessageEvent $event
+     * @param Message $message
      */
     public function __construct(
         protected OutgoingMessageEvent $event,
@@ -28,7 +29,10 @@ readonly class AmoJoMessageData implements MessageDataInterface
         ];
     }
 
-
+    /**
+     * @param array $params
+     * @return MessageDataInterface
+     */
     public static function create(array $params): MessageDataInterface
     {
         return new self(
@@ -37,6 +41,9 @@ readonly class AmoJoMessageData implements MessageDataInterface
         );
     }
 
+    /**
+     * @return EventType
+     */
     public function getEvent(): EventType
     {
         return EventType::SEND_MESSAGE;

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Database;
 
-use Doctrine\DBAL\ConnectionException;
 use Dot\DependencyInjection\Attribute\Inject;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class DatabaseBootstrapper implements BootstrapperInterface
 {
-    /** @var bool */
+    /** @var bool флаг для проверки */
     private static bool $isBootstrapped = false;
 
     /**
