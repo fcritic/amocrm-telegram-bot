@@ -28,6 +28,9 @@ readonly class TelegramFileService
     }
 
     /**
+     * @param string $fileId
+     * @param string $schema
+     * @return ResponseInterface
      * @throws GuzzleException
      * @throws Exception
      */
@@ -59,6 +62,9 @@ readonly class TelegramFileService
     }
 
     /**
+     * @param int $telegramUserId
+     * @param string $webhookSecret
+     * @return string|null
      * @throws Exception
      */
     public function getAvatarFileId(int $telegramUserId, string $webhookSecret): ?string
@@ -76,11 +82,19 @@ readonly class TelegramFileService
         return null;
     }
 
+    /**
+     * @param string $fileId
+     * @return string|null
+     */
     protected function getTokenByAvatar(string $fileId): ?string
     {
         return $this->externalUserRepo->getTokenByAvatar($fileId);
     }
 
+    /**
+     * @param string $fileId
+     * @return string|null
+     */
     protected function getTokenByMedia(string $fileId): ?string
     {
         return $this->messageRepo->getTokenByMedia($fileId);

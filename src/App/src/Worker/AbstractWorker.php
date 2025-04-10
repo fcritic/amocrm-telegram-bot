@@ -13,28 +13,43 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
 /**
- * Базовый воркер
+ * Базовый класс для реализации воркеров, обрабатывающих задачи из очереди Beanstalk.
+ * Реализует:
+ * - Подключение к очереди
+ * - Цикл ожидания/обработки задач
+ * - Базовую обработку ошибок
+ * - Удаление успешно выполненных задач
  */
 abstract class AbstractWorker implements QueueWorkerInterface
 {
     /** @var Pheanstalk Текущее подключение к серверу очередей */
     protected Pheanstalk $connection;
 
-    /** @var string Просматриваемая очередь */
+    /**
+     * @var string Имя очереди, которую обрабатывает воркер.
+     * Должна быть переопределена в дочерних классах.
+     */
     protected string $queue = 'default';
 
+    /**
+     * @param BeanstalkConfig $beanstalk Конфигурация подключения к Beanstalk.
+     * Содержит хост, порт и таймауты.
+     */
     public function __construct(BeanstalkConfig $beanstalk)
     {
         $this->connection = $beanstalk->getConnection();
     }
 
     /**
-     * Вызов через CLI
+     * Основной цикл обработки задач:
+     * 1. Подключается к указанной очереди ($this->queue)
+     * 2. Игнорирует дефолтную очередь (default)
+     * 3. Резервирует задачи из очереди
+     * 4. Обрабатывает задачу через метод process()
+     * 5. Удаляет успешно обработанную задачу
+     * 6. В случае ошибки вызывает handleException()
      *
-     * Тут -> конектимся с сервером очередей
-     * -> Просматриваем только текущею очередь
-     * -> Игнорируем дефолтную очередь
-     * -> Ожидаем задачи в очередь
+     * @param OutputInterface $output Интерфейс для логирования в консоль.
      */
     public function execute(OutputInterface $output): void
     {
@@ -58,12 +73,27 @@ abstract class AbstractWorker implements QueueWorkerInterface
         }
     }
 
-    /** Вывод ошибок */
+    /**
+     * Обработчик ошибок при выполнении задачи.
+     * Выводит в консоль:
+     * - Сообщение об ошибке
+     * - Стек вызовов
+     * - Данные задачи
+     *
+     * @param Throwable $exception Пойманное исключение
+     * @param Job $job Задача, вызвавшая ошибку
+     */
     private function handleException(Throwable $exception, Job $job): void
     {
         echo 'Error Unhandled exception' . $exception . PHP_EOL . $job->getData();
     }
 
-    /** Обработка задачи */
+    /**
+     * Абстрактный метод для обработки задачи.
+     * Должен быть реализован в дочерних классах.
+     *
+     * @param array $data Данные задачи (распаршенный JSON)
+     * @param OutputInterface $output Интерфейс для логирования
+     */
     abstract public function process(array $data, OutputInterface $output): void;
 }

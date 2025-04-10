@@ -28,6 +28,13 @@ use Vjik\TelegramBot\Api\Type\ReactionTypeEmoji;
 use Vjik\TelegramBot\Api\Type\ReplyParameters;
 use Vjik\TelegramBot\Api\Type\User;
 
+/**
+ * Сервис-обертка для работы с Telegram Bot API:
+ * - Настройка вебхуков
+ * - Отправка сообщений/реакций
+ * - Валидация входящих запросов
+ * - Генерация секретных токенов
+ */
 class TelegramBotService
 {
     /** @var TelegramBotApi */
@@ -54,11 +61,14 @@ class TelegramBotService
     }
 
     /**
-     * Настройка вебхука тг бота
+     * Настраивает вебхук для Telegram-бота:
+     * - Указывает URL для обработки событий
+     * - Разрешает обработку сообщений/редактирований/реакций
+     * - Устанавливает секретный токен для верификации запросов
      *
-     * @param string $token токен ТГ бота
-     * @return User|null
-     * @throws Exception
+     * @param string $token Токен бота из BotFather
+     * @return User|null Информация о боте или null при ошибке
+     * @throws Exception При неудачной настройке вебхука
      */
     public function setWebhook(string $token): ?User
     {
@@ -81,10 +91,11 @@ class TelegramBotService
     }
 
     /**
-     * Генерация секретного токена для заголовков хука от тг бота
+     * Генерирует уникальный секретный токен на основе токена бота.
+     * Используется для верификации входящих вебхуков.
      *
-     * @param string $botToken токен ТГ бота
-     * @return string секретный токен для заголовка ``X-Telegram-Bot-Api-Secret-Token``
+     * @param string $botToken Токен бота (например: "123456:ABC-DEF1234ghIkl")
+     * @return string UUID v5 в формате строки
      */
     public static function generateSecretToken(string $botToken): string
     {
@@ -92,10 +103,11 @@ class TelegramBotService
     }
 
     /**
-     * Валидация хука сообщения
+     * Проверяет соответствие секретного токена из заголовка запроса
+     * сохраненному значению в базе данных.
      *
-     * @param string $secretHeader получение секретного токена из заголовков запроса хука
-     * @return bool ответ при валидации хука
+     * @param string $secretHeader Значение заголовка X-Telegram-Bot-Api-Secret-Token
+     * @return bool true если токен верифицирован
      */
     public function isValidWebhook(string $secretHeader): bool
     {
@@ -106,6 +118,13 @@ class TelegramBotService
     }
 
     /**
+     * Основной метод для отправки событий в Telegram:
+     * - Определяет тип события (сообщение/реакция/индикатор)
+     * - Перенаправляет обработку в соответствующий метод
+     *
+     * @param AbstractWebHookEvent $event Событие для отправки
+     * @return Message|null Объект сообщения (для текстовых/медиа-сообщений)
+     * @throws NotFountTokenException Если токен бота не найден
      * @throws Exception
      */
     public function sendEventTelegram(AbstractWebHookEvent $event): Message|null
@@ -128,9 +147,13 @@ class TelegramBotService
     }
 
     /**
-     * @param OutgoingMessageEvent $event
-     * @return null
-     * @throws RuntimeException
+     * Отправляет сообщение в Telegram.
+     * Поддерживаемые типы: текст, голос, стикер, документ, видео.
+     *
+     * @param OutgoingMessageEvent $event Событие с данными сообщения
+     * @return Message|null Объект отправленного сообщения
+     * @throws RuntimeException При ошибке API Telegram
+     * @throws InvalidArgumentException При неподдерживаемом типе сообщения
      */
     protected function sendMessage(OutgoingMessageEvent $event): Message|null
     {
@@ -184,6 +207,14 @@ class TelegramBotService
         return $result ?? null;
     }
 
+    /**
+     * Добавляет реакцию к сообщению.
+     *
+     * @param ReactionEvent $event Событие с данными реакции:
+     *   - emoji: смайл (например, "👍")
+     *   - messageUid: ID сообщения в Telegram
+     *   - conversation: ID чата
+     */
     protected function sendReaction(ReactionEvent $event): void
     {
         $this->bot->setMessageReaction(
@@ -193,6 +224,11 @@ class TelegramBotService
         );
     }
 
+    /**
+     * Активирует индикатор "Печатает..." в указанном чате.
+     *
+     * @param TypingEvent $event Событие с данными чата
+     */
     protected function sendTyping(TypingEvent $event): void
     {
         $this->bot->sendChatAction(
