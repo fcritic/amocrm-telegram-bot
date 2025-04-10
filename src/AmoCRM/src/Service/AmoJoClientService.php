@@ -27,14 +27,17 @@ use Telegram\Repository\Interface\TelegramConnectionRepositoryInterface;
 use Vjik\TelegramBot\Api\Type\Update\Update;
 
 /**
- * Обертка для AmoJoClient
+ * Сервис-обертка для работы с API чатов amoCRM:
+ * - Отправка сообщений, реакций, обновление статусов
+ * - Обработка событий Telegram (сообщения, редактирование, реакции)
+ * - Управление подключением каналов
  */
-readonly class AmoJoClientService
+class AmoJoClientService
 {
-    /** @var Update */
+    /** @var Update Текущее обрабатываемое событие Telegram */
     protected Update $event;
 
-    /** @var TelegramMessageData */
+    /** @var TelegramMessageData DTO с данными сообщения для AmoJo */
     protected TelegramMessageData $messageData;
 
     public function __construct(
@@ -49,15 +52,11 @@ readonly class AmoJoClientService
 
     /**
      * Основной метод обработки событий:
-     * - Отправка сообщения
-     * - Редактирования сообщения
-     * - Реакция на сообщения
+     * - Определяет тип события (SEND_MESSAGE, EDIT_MESSAGE, REACTION_MESSAGE)
+     * - Перенаправляет обработку в соответствующий метод
      *
-     * @param Update $event
-     * @param TelegramMessageData $messageData
-     * @return AbstractResponse
-     * @throws NotFountAmoJoIdException
-     * @throws Exception
+     * @throws NotFountAmoJoIdException Если аккаунт не найден
+     * @throws Exception При ошибках API
      */
     public function sendEventAmoJo(Update $event, TelegramMessageData $messageData): AbstractResponse
     {
@@ -74,7 +73,9 @@ readonly class AmoJoClientService
     }
 
     /**
-     * Получение данных аккаунта с валидацией
+     *  Получает данные аккаунта по секрету вебхука:
+     *  - Ищет привязку Telegram-бота к аккаунту amoCRM
+     *  - Валидирует наличие AmoJo ID
      *
      * @param string $webhookSecret
      * @return array
@@ -97,7 +98,9 @@ readonly class AmoJoClientService
     }
 
     /**
-     * Фабрика создания Payload
+     *  Создает объект Payload для AmoJo API:
+     *  - Устанавливает чат, отправителя и сообщение
+     *  - Используется для всех типов сообщений
      *
      * @param string $chatId
      * @param Sender $sender
@@ -113,6 +116,12 @@ readonly class AmoJoClientService
     }
 
     /**
+     *  Отправка нового сообщения:
+     *  - Создает отправителя через SenderFactory
+     *  - Формирует сообщение через MessageFactory
+     *  - Обрабатывает replyTo-логику
+     *  - Отправляет через AmoJoClient
+     *
      * @param string $amoJoId
      * @param string $externalId
      * @return MessageResponse
@@ -135,6 +144,10 @@ readonly class AmoJoClientService
     }
 
     /**
+     *  Редактирование существующего сообщения:
+     *  - Использует данные из editedMessage
+     *  - Не обрабатывает replyTo
+     *
      * @param string $amoJoId
      * @return MessageResponse
      * @throws Exception
@@ -154,6 +167,11 @@ readonly class AmoJoClientService
     }
 
     /**
+     *  Обработка реакций на сообщение:
+     *  - Определяет тип реакции (добавление/удаление)
+     *  - Получает AmoJo ID сообщения из локальной БД
+     *  - Формирует запрос с emoji
+     *
      * @param string $amoJoId
      * @return ReactResponse|null
      * @throws Exception
@@ -187,6 +205,10 @@ readonly class AmoJoClientService
     }
 
     /**
+     *  Обновление статуса доставки сообщения:
+     *  - Используется для подтверждения доставки или ошибок
+     *  - Формирует объект Deliver с кодом и описанием ошибки
+     *
      * @param string $amoJoId
      * @param string $messageRefId
      * @param int $status
@@ -211,6 +233,8 @@ readonly class AmoJoClientService
     }
 
     /**
+     *  Подключение канала к аккаунту
+     *
      * @param string $amoJoId
      * @return ConnectResponse
      */

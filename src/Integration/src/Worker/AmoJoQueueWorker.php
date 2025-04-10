@@ -17,9 +17,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Telegram\Service\TelegramBotService;
 use Throwable;
 
+/**
+ * Воркер для обработки событий из очереди amoJo.
+ * Отвечает за:
+ * - Парсинг входящих вебхуков
+ * - Отправку событий в Telegram
+ * - Сохранение данных в БД
+ * - Обработку ошибок и обновление статусов доставки
+ */
 class AmoJoQueueWorker extends AbstractWorker
 {
-    /** @var string Просматриваемая очередь */
+    /** @var string Имя очереди Beanstalk, которую обрабатывает воркер */
     protected string $queue = 'amojo_queue';
 
     public function __construct(
@@ -33,10 +41,16 @@ class AmoJoQueueWorker extends AbstractWorker
     }
 
     /**
-     * Воркер получает валидный вебхук из amoJo по сигнатуре и структуре.
-     * Создает дто для передачи его в сервис базы
-     * -> Отправляет событие в сервис телеграм
-     * -> В случае если тип события сообщение, то сохраняет его
+     * Основной метод обработки задачи из очереди:
+     * 1. Парсит сырые данные вебхука в DTO
+     * 2. Отправляет событие в Telegram
+     * 3. Для исходящих сообщений сохраняет данные в БД
+     * 4. Обрабатывает ошибки и обновляет статус доставки в amoJo в случае ошибки
+     *
+     * @param array $data Данные задачи из очереди:
+     * - body: сырые данные вебхука
+     * - scope_id: скоп по аккаунту
+     * @param OutputInterface $output Интерфейс для вывода логов
      */
     public function process(array $data, OutputInterface $output): void
     {

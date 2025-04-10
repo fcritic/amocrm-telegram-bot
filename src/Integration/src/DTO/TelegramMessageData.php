@@ -13,8 +13,15 @@ use Vjik\TelegramBot\Api\Type\Update\Update;
 
 readonly class TelegramMessageData implements MessageDataInterface
 {
+    /** @var Message|MessageReactionUpdated */
     protected Message|MessageReactionUpdated $message;
 
+    /**
+     * @param Update $update
+     * @param string|null $fileId
+     * @param string $webhookSecret
+     * @param MessageResponse|null $messageResponse
+     */
     public function __construct(
         protected Update $update,
         protected ?string $fileId,
@@ -28,6 +35,10 @@ readonly class TelegramMessageData implements MessageDataInterface
         }
     }
 
+    /**
+     * @param array $params
+     * @return TelegramMessageData
+     */
     public static function create(array $params): TelegramMessageData
     {
         return new self(
@@ -38,6 +49,10 @@ readonly class TelegramMessageData implements MessageDataInterface
         );
     }
 
+    /**
+     * @param MessageResponse $response
+     * @return self
+     */
     public function withResponse(MessageResponse $response): self
     {
         return new self(
@@ -48,6 +63,9 @@ readonly class TelegramMessageData implements MessageDataInterface
         );
     }
 
+    /**
+     * @return array
+     */
     public function getAccountIdentifier(): array
     {
         return [
@@ -56,6 +74,9 @@ readonly class TelegramMessageData implements MessageDataInterface
         ];
     }
 
+    /**
+     * @return EventType
+     */
     public function getEvent(): EventType
     {
         return match (true) {
@@ -65,61 +86,97 @@ readonly class TelegramMessageData implements MessageDataInterface
         };
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalChatId(): ?string
     {
         return (string) $this->message->chat->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getAmoChatId(): ?string
     {
         return $this->messageResponse->getConversationRefId();
     }
 
+    /**
+     * @return string|null
+     */
     public function getAmoUserId(): ?string
     {
         return $this->messageResponse->getSenderRefId();
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalUserId(): ?string
     {
         return (string) $this->message->from->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalUserName(): ?string
     {
         return $this->message->from->firstName;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalUserPhone(): ?string
     {
         return null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalUserUsername(): ?string
     {
         return $this->message->from->username;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalUserAvatar(): ?string
     {
         return $this->fileId;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalUserProfileLink(): ?string
     {
         return 'https://t.me/' . $this->getExternalUserUsername();
     }
 
+    /**
+     * @return string|null
+     */
     public function getExternalMessageId(): ?string
     {
         return (string) $this->message->messageId;
     }
 
+    /**
+     * @return string|null
+     */
     public function getAmoMessageId(): ?string
     {
         return $this->messageResponse->getMsgRefId();
     }
 
+    /**
+     * @return string|null
+     */
     public function getMessageType(): ?string
     {
         $message = $this->message;
@@ -142,11 +199,17 @@ readonly class TelegramMessageData implements MessageDataInterface
         return null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getMessageContent(): ?string
     {
         return $this->message?->text ?? $this->message?->caption ?? '';
     }
 
+    /**
+     * @return string|null
+     */
     public function getMedia(): ?string
     {
         $message = $this->message;
@@ -169,11 +232,17 @@ readonly class TelegramMessageData implements MessageDataInterface
         return '';
     }
 
+    /**
+     * @return string|null
+     */
     public function getFileName(): ?string
     {
         return $this->message->document?->fileName ?? '';
     }
 
+    /**
+     * @return int|null
+     */
     public function getFileSize(): ?int
     {
         return $this->message->document?->fileSize ?? 0;

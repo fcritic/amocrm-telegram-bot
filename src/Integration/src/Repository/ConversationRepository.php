@@ -21,6 +21,12 @@ class ConversationRepository extends AbstractRepository implements ConversationR
         return Conversation::class;
     }
 
+    /**
+     * Получение чата по id чата телеграм
+     *
+     * @param string $telegramChatId
+     * @return Conversation|null
+     */
     public function getConversationByTelegramId(string $telegramChatId): ?Conversation
     {
         /** @var Conversation */

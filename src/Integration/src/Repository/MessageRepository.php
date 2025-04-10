@@ -60,6 +60,15 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
         return $message->id;
     }
 
+    /**
+     * @param int $telegramMessageId
+     * @param string $type
+     * @param string|null $content
+     * @param string|null $media
+     * @param string|null $fileName
+     * @param int|null $fileSize
+     * @return int
+     */
     public function updateMessage(
         int $telegramMessageId,
         string $type,
@@ -105,6 +114,12 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryI
             ?->token_bot;
     }
 
+    /**
+     * Получения id сообщения на стороне amoJo по id сообщения телеграмма
+     *
+     * @param int $telegramMessageId
+     * @return string|null
+     */
     public function getAmoMessageId(int $telegramMessageId): ?string
     {
         /** @var Message $massage */
