@@ -1,0 +1,31 @@
+{
+    "widget": {
+        "name": "widget.name",
+        "description": "widget.description",
+        "short_description": "widget.short_description",
+        "version": "1.0.5",
+        "interface_version": 2,
+        "init_once": false,
+        "locale": ["ru"],
+        "installation": true
+    },
+    "locations": ["settings"],
+    "tour": {
+        "is_tour": true,
+        "tour_images": {
+            "ru": [
+                "/images/logo_main.png",
+                "/images/logo_main.png",
+                "/images/logo_main.png"
+            ]
+        },
+        "tour_description": "widget.tour_description"
+    },
+    "settings": {
+        "api_token": {
+            "name": "settings.api_token",
+            "type": "text",
+            "required": false
+        }
+    }
+}

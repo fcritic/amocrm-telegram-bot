@@ -1,0 +1,84 @@
+<template>
+  <div class="widget_settings_block">
+    <!-- Заголовок блока -->
+    <div class="widget_settings_block__descr">
+      <svg class="widget-settings-block__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
+           height="24">
+        <path
+            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394a.759.759 0 0 1-.6.295h-.002l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.643-.203-.658-.643.136-.953l11.57-4.458c.537-.232 1.006.128.832.941z"/>
+      </svg>
+      <h2 class="widget-settings-block__title">Интеграция с Telegram</h2>
+    </div>
+
+    <!-- Добавляем аккордеон с инструкцией -->
+    <details class="guide-accordion">
+      <summary class="guide-summary">Как создать Telegram-бота и получить API-токен</summary>
+      <div class="guide-content">
+        <section>
+          <h3>Создание нового бота</h3>
+          <p>Чтобы создать нового бота в Telegram, выполните следующие шаги:</p>
+          <ol>
+            <li>Откройте Telegram и найдите @BotFather</li>
+            <li>Отправьте команду <code>/newbot</code></li>
+            <li>Укажите имя и username для бота (username должен заканчиваться на <code>@</code>, например, <code>@MyBot</code>)</li>
+            <li>Скопируйте API-токен, который BotFather отправит в ответном сообщении</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Получение токена для существующего бота</h3>
+          <p>Если у вас уже есть бот, выполните следующие действия:</p>
+          <ol>
+            <li>Откройте чат с @BotFather в Telegram</li>
+            <li>Отправьте команду <code>/mybots</code></li>
+            <li>Выберите нужный бот из списка и нажмите API Token</li>
+            <li>Скопируйте полученный токен</li>
+          </ol>
+        </section>
+
+        <p class="note"><strong>Примечание:</strong> Сохраните API-токен в безопасном месте. Не передавайте его третьим лицам, так как он предоставляет полный доступ к вашему боту.</p>
+      </div>
+    </details>
+
+    <div class="widget_settings_block__fields" id="widget_settings__fields_wrapper">
+      <div class="widget_settings_block__item_field">
+        <div class="widget_settings_block__title_field" title="">Для активации интеграции введите токен и нажмите кнопку
+          сохранить:
+        </div>
+        <div class="widget_settings_block__input_field">
+          <input name="api_token"
+                 v-model="token"
+                 class="widget_settings_block__controls__ text-input"
+                 type="text"
+                 placeholder="Введите токен от вашего Telegram Bot`a"
+                 autocomplete="off">
+        </div>
+        <div class="widget_settings_block__error widget_settings_block__errorbhvrguqlyeyl0xgyj6miewy4qmqqma0vcr9xumsr">
+          {{ errorMessage }}
+        </div>
+      </div>
+      <div class="widget_settings_block__controls widget_settings_block__controls_top">
+        <button type="button"
+                data-onsave-destroy-modal="true"
+                @click="saveToken"
+                :data-id="widgetId"
+                class="button-input    js-widget-save button-input-disabled"
+                tabindex=""
+                :id="'save_' + widgetCode">
+          <span class="button-input-inner ">
+            <span class="button-input-inner__text">Сохранить</span>
+          </span>
+        </button>
+      </div>
+      <div class="switcher_wrapper">
+        <label for="widget_active__sw"
+               class="switcher switcher__on switcher_blue widget-settings__switcher"
+               id="">
+        </label>
+        <input type="checkbox" value="Y" name="widget_active"
+               id="widget_active__sw" class="switcher__checkbox"
+               checked="">
+      </div>
+    </div>
+  </div>
+</template>

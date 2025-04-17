@@ -1,0 +1,99 @@
+.mobilon-localtime {
+    position: absolute;
+    top: 5px;
+    right: 0;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 0px 3px;
+    cursor: pointer;
+}
+
+.mobilon-localtime img {
+    width: 15px;
+    height: 15px;
+}
+
+.mobilon-localtime-good {
+    border-color: #87d887;
+}
+
+.mobilon-localtime-bad {
+    border-color: #ef9b9b;
+}
+
+.mobilon-sms-text-area {
+    height: 189px;
+    width: 100%;
+    min-height: 58px;
+    resize: none;
+    display: block;
+}
+
+.mobilon-notification {
+    position: relative;
+    width: 364px;
+    left: 64px;
+    opacity: 1;
+    box-shadow: 0 -3px 25px 0 rgba(0, 0, 0, .13);
+}
+
+.mobilon-notification-close-button {
+    position: absolute;
+    z-index: 1;
+    right: 6px;
+    top: 6px;
+    cursor: pointer;
+    padding: 10px;
+    width: 9px;
+}
+
+.mobilon-notification-text-container {
+    margin-left: 30px;
+}
+
+.mobilon-notification-text-container h2 {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    width: 185px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 0 0;
+}
+
+.mobilon-notification-content-container {
+    background: #ffffff !important;
+}
+
+.mobilon-quick-call-mode-full {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px auto;
+}
+
+.mobilon-quick-call-mode-minimized {
+    z-index: 100;
+    position: fixed;
+    bottom: 0;
+    right: 20%;
+    width: 240px;
+    height: 30px;
+    cursor: pointer;
+    background-color: #de4343;
+    color: #f2f2f2;
+}
+
+.mobilon-quick-call-mode-minimized div {
+    margin: 5px 10px;
+}
+
+.mobilon-quick-call-mode-state-timer {
+    cursor: pointer;
+    font-size: 50px;
+}
+
+.mobilon-side-caption {
+    padding: 5px 0;
+}
