@@ -8,7 +8,7 @@ Vue.config.silent = true;
 import {TableComponent, TableColumn} from 'vue-table-component';
 import config from "./config";
 import {ApiService} from "./service/apiService";
-import Settings from './components/settings/index.vue';
+import Settings from './components/settings.vue';
 
 Vue.component('table-component', TableComponent);
 Vue.component('table-column', TableColumn);
@@ -30,7 +30,7 @@ const Widget = {
     settings(self) {
         store.commit('clearError');
         const vm = new Vue({
-            store,
+            store: store,
             render: h => h(Settings, {
                 props: {
                     widget: self
@@ -48,9 +48,7 @@ const Widget = {
         store.commit('setSettingsComponent', settingsComponent);
     },
 
-    advancedSettings() {
-
-    },
+    advancedSettings() {},
 
     async onSave(widget, params) {
         store.commit('clearError');
@@ -65,14 +63,14 @@ const Widget = {
         const component = store.state.settings.component;
         const token = store.state.settings.token;
 
-        console.log('стор', {
-            'компонент': component,
-            'токен': token
-        });
+        if (component || token) {
+            console.error('Fatal error');
+            throw new Error('The Settings component or token is not defined');
+        }
 
         try {
             const response = await ApiService.request(widget, {
-                url: config.WEBHOOK_URL,
+                url: config.URL,
                 data: {
                     account_id: account.id,
                     account_uid: account.amojo_id,
@@ -81,42 +79,28 @@ const Widget = {
                 clientUuid: widget.params.oauth_client_uuid,
             });
 
-            console.log('после респонса', response);
-
             if (response.code === 200) return true;
 
-
             store.commit('setError', response);
-            if (component && component.setError) {
-                component.setError(response.message || 'Произошла ошибка');
+            if (component.setError) {
+                component.setError(response.message);
             }
             return false;
 
         } catch (err) {
-            console.log('экзепшен', err);
             store.commit('setError', err);
-            console.log('компонент сетинга в экзепшене', component);
-            console.log('сеттим ошибку');
-            component.setError(err.message || 'Произошла ошибка');
+            component.setError(err.message);
             return false;
         }
     },
 
-    destroy() {
+    destroy() {},
 
-    },
+    contacts_selected() {},
 
-    contacts_selected() {
+    leads_selected() {},
 
-    },
-
-    leads_selected() {
-
-    },
-
-    tasks_selected() {
-
-    }
+    tasks_selected() {}
 };
 
 export default Widget;

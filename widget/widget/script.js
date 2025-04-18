@@ -38,7 +38,6 @@ define([
 
       onSave(params) {
         return App.default.onSave(self, params);
-        // return true;
       },
 
       destroy() {

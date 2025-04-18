@@ -31,40 +31,13 @@ module.exports = {
                 }
             },
             {
-                test: /\.html$/,
-                use: {
-                    loader: 'html-loader',
-                    options: {
-                        minimize: false, // Отключаем минификацию для отладки
-                        esModule: false // Важно для совместимости с CommonJS
-                    }
-                }
-            },
-            {
-                test: /\.scss$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            implementation: require('sass'),
-                            sassOptions: {
-                                fiber: false
-                            }
-                        }
-                    }
-                ]
-            },
-            {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 exclude: file => (
                     /node_modules/.test(file) &&
                     !/\.vue\.js/.test(file)
                 )
-            },
-            {
+            }, {
                 test: /\.css$/,
                 use: [
                     'vue-style-loader',
@@ -74,9 +47,8 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.vue', '.json', '.scss', '.css'],
         alias: {
-            '@': path.resolve(__dirname, './src'),
+            '@': path.resolve(__dirname, './src/components'),
         }
     },
     plugins: [

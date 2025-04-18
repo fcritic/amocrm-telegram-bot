@@ -16,7 +16,6 @@ export default new Vuex.Store({
             state.settings.component = component;
         },
         setToken(state, token) {
-            console.log('токен из стора', token)
             state.settings.token = token;
         },
         setError(state, error) {

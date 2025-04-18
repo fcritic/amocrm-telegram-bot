@@ -110,3 +110,4 @@ widget/app.js.map
 widget.zip
 
 .idea
+package-lock.json
