@@ -75,7 +75,7 @@ const Widget = {
         component.setLoading(true);
 
         try {
-            const response = await ApiService.request(widget, {
+            const response = await ApiService.request(widget, config.TIMEOUT, {
                 url: config.URL,
                 data: {
                     account_id: account.id,
