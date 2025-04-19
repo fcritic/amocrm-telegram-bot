@@ -29,8 +29,11 @@ const Widget = {
 
     settings(self) {
         store.commit('clearError');
+
         const vm = new Vue({
             store: store,
+            // Передачата store в компонент this.store
+            provide: {store},
             render: h => h(Settings, {
                 props: {
                     widget: self
@@ -48,7 +51,9 @@ const Widget = {
         store.commit('setSettingsComponent', settingsComponent);
     },
 
-    advancedSettings() {},
+    advancedSettings() {
+
+    },
 
     async onSave(widget, params) {
         store.commit('clearError');
@@ -63,10 +68,11 @@ const Widget = {
         const component = store.state.settings.component;
         const token = store.state.settings.token;
 
-        if (component || token) {
-            console.error('Fatal error');
-            throw new Error('The Settings component or token is not defined');
+        // Если компонент Settings не найден
+        if (typeof component !== 'object' || component === null) {
+            throw new Error('Invalid component instance');
         }
+        component.setLoading(true);
 
         try {
             const response = await ApiService.request(widget, {
@@ -88,19 +94,30 @@ const Widget = {
             return false;
 
         } catch (err) {
+            console.error('[Widget] Error:', err);
             store.commit('setError', err);
             component.setError(err.message);
             return false;
+        } finally {
+            component.setLoading(false);
         }
     },
 
-    destroy() {},
+    destroy() {
 
-    contacts_selected() {},
+    },
 
-    leads_selected() {},
+    contacts_selected() {
 
-    tasks_selected() {}
+    },
+
+    leads_selected() {
+
+    },
+
+    tasks_selected() {
+
+    }
 };
 
 export default Widget;

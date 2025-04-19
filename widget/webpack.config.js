@@ -20,14 +20,16 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js?$/,
-                loader: 'babel-loader',
-                options: {
-                    presets: ['@babel/preset-env'],
-                    plugins: [
-                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
-                    ]
+                test: /\.js$/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                        plugins: [
+                            ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                            ["@babel/plugin-proposal-class-properties", { "loose": true }]
+                        ]
+                    }
                 }
             },
             {
@@ -37,7 +39,8 @@ module.exports = {
                     /node_modules/.test(file) &&
                     !/\.vue\.js/.test(file)
                 )
-            }, {
+            },
+            {
                 test: /\.css$/,
                 use: [
                     'vue-style-loader',

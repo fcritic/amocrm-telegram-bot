@@ -8,10 +8,16 @@ export default class Settings extends Vue {
 
   token = '';
   errorMessage = '';
+  loading = false;
 
   /**
-   * Заполняет значение в импут
+   * @param isLoading
    */
+  setLoading(isLoading) {
+    this.loading = isLoading;
+  }
+
+  /** Заполняет значение в импут */
   created() {
     this.token = this.widget.get_settings().api_token || '';
   }
@@ -28,10 +34,13 @@ export default class Settings extends Vue {
    * @returns {Promise<void>}
    */
   async saveToken() {
+    if (this.loading) return;
+
     if (!this.token) {
       this.setError('Telegram token is required');
       return;
     }
+
     this.$emit('save-token', this.token);
   }
 
@@ -45,7 +54,8 @@ export default class Settings extends Vue {
     // 1. token пустой
     // 2. оба значения (token и api_token) пустые (включено в первое условие)
     // 3. token равен api_token
-    return !this.token || this.token === apiToken;
+    // 4. запрос был отправлен
+    return this.loading || !this.token || this.token === apiToken;
   }
 
   /**
@@ -130,7 +140,7 @@ export default class Settings extends Vue {
                 @click="saveToken"
                 :data-id="widgetId"
                 :disabled="isSaveButtonDisabled"
-                :class="['button-input', 'js-widget-save', 'button-input-disabled', { 'custom-button': isSaveButtonDisabled }]"
+                class="button-input js-widget-save button-input-disabled"
                 tabindex=""
                 :id="'save_' + widgetCode">
           <span class="button-input-inner ">
@@ -155,7 +165,7 @@ export default class Settings extends Vue {
 .widget_settings_block {
   background: #FFFFFF;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 24px 8px 24px rgba(0, 0, 0, 0.08);
   padding: 32px;
   font-family: 'Inter', system-ui, sans-serif;
 }

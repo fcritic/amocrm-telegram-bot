@@ -25,4 +25,4 @@ export default new Vuex.Store({
             state.settings.error = null;
         }
     }
-})
+});
