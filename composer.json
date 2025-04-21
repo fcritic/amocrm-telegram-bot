@@ -81,10 +81,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Account\\": "src/Account/src",
             "AmoCRM\\": "src/AmoCRM/src",
             "App\\": "src/App/src",
-            "Chat\\": "src/Chat/src",
             "Integration\\": "src/Integration/src",
             "Telegram\\": "src/Telegram/src"
         }
