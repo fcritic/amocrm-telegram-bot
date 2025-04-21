@@ -7,6 +7,7 @@ namespace AmoCRM\Repository;
 use AmoCRM\Model\Account;
 use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use App\Repository\AbstractRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -107,5 +108,17 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
             ->with('accessToken')
             ->where('amo_account_id', $amoAccountId)
             ->first();
+    }
+
+    /**
+     * Получения всех аккаунтов и их токенов
+     *
+     * @return Collection
+     */
+    public function getAllAccountsWithTokens(): Collection
+    {
+        return $this->query()
+            ->with('accessToken')
+            ->get();
     }
 }

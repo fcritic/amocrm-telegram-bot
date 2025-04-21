@@ -125,6 +125,21 @@ readonly class OAuthService implements OAuthServiceInterface
     }
 
     /**
+     * Обновляет пару токенов в обмен на refresh токен.
+     * Используется для команды
+     *
+     * @param string $subDomain
+     * @param AccessTokenInterface $accessToken
+     * @return AccessTokenInterface
+     * @throws AmoCRMoAuthApiException
+     */
+    public function refreshToken(string $subDomain, AccessTokenInterface $accessToken): AccessTokenInterface
+    {
+        $this->client->setAccountBaseDomain($subDomain);
+        return $this->client->getOAuthClient()->getAccessTokenByRefreshToken($accessToken);
+    }
+
+    /**
      * Получения клиента по ID аккаунта amoCRM
      *
      * @param int $accountId

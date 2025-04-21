@@ -11,6 +11,7 @@ services:
             - .env
         volumes:
             - .:/var/www/application
+            - ./logs/cron:/var/log/cron
         container_name: application-backend
 
     # Nginx Service

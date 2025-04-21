@@ -6,6 +6,7 @@ namespace Integration;
 
 use Dot\DependencyInjection\Factory\AttributedServiceFactory;
 use Integration\Command\AmoJoQueueWorkerCommand;
+use Integration\Command\RefreshTokensCommand;
 use Integration\Command\TelegramQueueWorkerCommand;
 use Integration\Handler\InstallingWidgetHandler;
 use Integration\Repository\ConversationRepository;
@@ -51,6 +52,7 @@ class ConfigProvider
                 'commands' => [
                     'amojo:sync-message' => AmoJoQueueWorkerCommand::class,
                     'telegram:sync-message' => TelegramQueueWorkerCommand::class,
+                    'refresh-tokens' => RefreshTokensCommand::class,
                 ]
             ]
         ];
