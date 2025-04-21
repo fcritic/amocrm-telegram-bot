@@ -128,8 +128,8 @@ ___
 
     - Укажите redirect_uri: ```https://ваш-домен/api/amocrm/installing-integration```
     - Множественные источники: поддерживает
-    - <a href="https://www.amocrm.ru/developers/content/chats/chat-start">Загрузите виджет</a>
-    - <a href="https://github.com/fcritic/amocrm-telegram-bot/tree/master/widget">Пример OAuth 2.0 по шагам</a>
+    - <a href="https://github.com/fcritic/amocrm-telegram-bot/tree/master/widget">Загрузите виджет</a>
+    - <a href="https://www.amocrm.ru/developers/content/oauth/step-by-step">Пример OAuth 2.0 по шагам</a>
 
 3. Зарегистрируйте канал чатов с технической поддержки amoCRM
 
