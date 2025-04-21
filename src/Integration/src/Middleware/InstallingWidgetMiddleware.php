@@ -28,9 +28,6 @@ readonly class InstallingWidgetMiddleware implements MiddlewareInterface
      * @param ServerRequestInterface $request Запрос
      * @param RequestHandlerInterface $handler InstallingWidgetHandler
      * @return ResponseInterface ResponseInterface
-     * @throws DisposableTokenInvalidDestinationException
-     * @throws DisposableTokenExpiredException
-     * @throws DisposableTokenVerificationFailedException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -71,13 +68,13 @@ readonly class InstallingWidgetMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         } catch (DisposableTokenExpiredException $e) {
             // Время жизни токена истекло
-            throw new DisposableTokenExpiredException();
+            return new Response(DisposableTokenExpiredException::create()->getMessage());
         } catch (DisposableTokenInvalidDestinationException $e) {
             // Не прошёл проверку на адресата токена
-            throw new DisposableTokenInvalidDestinationException();
+            return new Response(DisposableTokenInvalidDestinationException::create()->getMessage());
         } catch (DisposableTokenVerificationFailedException $e) {
             // Токен не прошел проверку подписи
-            throw new DisposableTokenVerificationFailedException();
+            return new Response(DisposableTokenVerificationFailedException::create()->getMessage());
         }
     }
 }

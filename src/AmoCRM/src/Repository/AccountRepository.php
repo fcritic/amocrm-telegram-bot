@@ -7,6 +7,7 @@ namespace AmoCRM\Repository;
 use AmoCRM\Model\Account;
 use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use App\Repository\AbstractRepository;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -14,6 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class AccountRepository extends AbstractRepository implements AccountRepositoryInterface
 {
+    /** @var int */
+    public const CHUNK_SIZE = 250;
+
     /**
      * @return string
      */
@@ -107,5 +111,28 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
             ->with('accessToken')
             ->where('amo_account_id', $amoAccountId)
             ->first();
+    }
+
+    /**
+     * Получения всех аккаунтов и их токенов
+     *
+     * @param int $day
+     * @param Closure $callback
+     */
+    public function getAllAccountsWithTokens(int $day, Closure $callback): void
+    {
+        // Текущее время в Unix-формате
+        $currentTime = time();
+
+        $this->query()
+            ->whereHas('accessToken', function ($query) use ($currentTime, $day) {
+                // Условие: expires + 80 дней <= текущее время
+                $query->whereRaw("(`expires` + ?) <= ?", [
+                    $day * 86400, // 80 дней в секундах
+                    $currentTime
+                ]);
+            })
+            ->with('accessToken')
+            ->chunk(self::CHUNK_SIZE, $callback);
     }
 }

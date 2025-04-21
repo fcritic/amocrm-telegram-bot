@@ -1,0 +1,1 @@
+0 3 * * * /usr/local/bin/php /var/www/application/console.php app:refresh-tokens >> /var/log/cron.log 2>&1
