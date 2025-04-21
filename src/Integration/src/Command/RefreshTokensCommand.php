@@ -9,7 +9,6 @@ use AmoCRM\Model\Account;
 use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use AmoCRM\Service\OAuthService;
 use App\Database\BootstrapperInterface;
-use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,6 +19,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class RefreshTokensCommand extends Command
 {
+    /** @var int */
+    private const DAYS_BEFORE_UPDATE = 80;
+
     protected string $commandName = 'app:refresh-tokens';
 
     public function __construct(
@@ -64,25 +66,29 @@ class RefreshTokensCommand extends Command
         try {
             $this->bootstrapDatabase();
 
-            // Получение всех аккаунтов с токенами
-            $accounts = $this->accountRepo->getAllAccountsWithTokens();
             $processed = 0;
             $errors = 0;
 
-            foreach ($accounts as $account) {
-                foreach ($account->accessToken as $token) {
-                    try {
-                        $this->refreshAccountToken($account, $token);
-                        $processed++;
-                    } catch (\Exception $e) {
-                        $errors++;
-                        $io->error([
-                            'Account' => $account->amo_account_id,
-                            'Error' => $e->getMessage()
-                        ]);
+            // Передаем переменные $processed и $errors в замыкание
+            $this->accountRepo->getAllAccountsWithTokens(
+                self::DAYS_BEFORE_UPDATE,
+                function ($accounts) use ($io, &$processed, &$errors) {
+                    foreach ($accounts as $account) {
+                        foreach ($account->accessToken as $token) {
+                            try {
+                                $this->refreshAccountToken($account, $token);
+                                $processed++;
+                            } catch (\Exception $e) {
+                                $errors++;
+                                $io->error([
+                                    'Account' => $account->amo_account_id,
+                                    'Error' => $e->getMessage()
+                                ]);
+                            }
+                        }
                     }
                 }
-            }
+            );
 
             $io->success(sprintf(
                 'Processed tokens: %d | Errors: %d',
@@ -106,7 +112,7 @@ class RefreshTokensCommand extends Command
      */
     private function refreshAccountToken(Account $account, \AmoCRM\Model\AccessToken $token): void
     {
-        $oldToken = new AccessToken([
+        $oldToken = new \League\OAuth2\Client\Token\AccessToken([
             'access_token' => $token->access_token,
             'refresh_token' => $token->refresh_token,
             'expires' => $token->expires,

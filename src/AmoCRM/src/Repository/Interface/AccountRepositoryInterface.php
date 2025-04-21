@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AmoCRM\Repository\Interface;
 
 use AmoCRM\Model\Account;
-use Illuminate\Database\Eloquent\Collection;
+use Closure;
 
 interface AccountRepositoryInterface
 {
@@ -19,5 +19,5 @@ interface AccountRepositoryInterface
 
     public function getAccountAndTokens(int $amoAccountId): ?Account;
 
-    public function getAllAccountsWithTokens(): Collection;
+    public function getAllAccountsWithTokens(int $day, Closure $callback): void;
 }
