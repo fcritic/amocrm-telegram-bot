@@ -66,6 +66,7 @@ abstract class AbstractWorker implements QueueWorkerInterface
                     512,
                     JSON_THROW_ON_ERROR
                 ), $output);
+                sleep(1);
             } catch (Throwable $e) {
                 $this->handleException($e, $job);
             }

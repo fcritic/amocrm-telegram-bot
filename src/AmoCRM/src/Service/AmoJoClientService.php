@@ -130,7 +130,7 @@ class AmoJoClientService
     protected function sendMessage(string $amoJoId, string $externalId): MessageResponse
     {
         $payload = $this->createPayload(
-            (string) $this->event->message->chat->id,
+            sprintf('%s_%s', $this->event->message->chat->id, $externalId),
             $this->senderFactory->create(
                 $this->event->message->from,
                 $this->messageData->getExternalUserAvatar()

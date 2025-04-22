@@ -85,6 +85,14 @@ readonly class InstallingWidgetHandler implements RequestHandlerInterface
                 $e->getMessage()
             );
         }
-        return new Response(ResponseMessage::SUCCESS, ResponseStatus::SUCCESS);
+
+        return new Response(
+            message: ResponseMessage::SUCCESS,
+            code: ResponseStatus::SUCCESS,
+            data: [
+                'external_id' => $bot->username,
+                'name' => $bot->firstName,
+            ]
+        );
     }
 }
