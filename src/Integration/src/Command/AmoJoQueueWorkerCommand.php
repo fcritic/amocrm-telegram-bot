@@ -25,7 +25,7 @@ final class AmoJoQueueWorkerCommand extends AbstractQueueWorkerCommand
     {
         parent::__construct(
             $container,
-            'amojo:sync-message'
+            'app:amojo:sync-message'
         );
     }
 

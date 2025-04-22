@@ -25,7 +25,7 @@ final class TelegramQueueWorkerCommand extends AbstractQueueWorkerCommand
     {
         parent::__construct(
             $container,
-            'telegram:sync-message',
+            'app:telegram:sync-message',
         );
     }
 
