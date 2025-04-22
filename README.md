@@ -39,11 +39,21 @@
 
 ___
 
+## Технический стек
+| Компонент      | Технологии                             |
+|----------------|----------------------------------------|
+| Бэкенд         | PHP 8.2, Mezzio, Laravel Eloquent ORM  |
+| Очереди        | Beanstalkd, Pheanstalk                 |
+| База данных    | MySQL 8.0, Миграции через Phpmig       |
+| Инфраструктура | Docker, Nginx, PHP-FPM                 |
+| Интеграции     | amoCRM API, Telegram Bot API           |
+
+___
+
 ## Требования
 
 - Docker 27.5+
 - PHP 8.2+
-- MySQL 8.0+
 - Composer 2.7+
 
 ___
@@ -53,13 +63,12 @@ ___
 1. Клонируйте репозиторий:
 ```bash
   git clone git@github.com:fcritic/amocrm-telegram-bot.git
-  cd amocrm-telegram-integration
+  cd amocrm-telegram-bot
 ```
 
 #
 
 2. Настройте окружение:
-
 ```bash
   cp .env.example .env
 # Отредактируйте .env файл
@@ -67,79 +76,84 @@ ___
 
 #
 
-3. Установите конфигурацию
-    - Поменяйте в файле ```integrations.global.php``` host
+3. Установите композер
+```bash
+composer install -o
+```
 
 #
 
-4. Запустите систему:
+4. Установите конфигурацию
 
-- Сборка Docker-образа на основе ```Dockerfile``` и файлов из текущей папки
-> ```bash
->  docker build -t application-backend .
->```
-
-
-- Поднимает все сервисы из ```docker-compose.yml``` и запускает их в фоне
-> ```bash
-> docker-compose up -d
-> ```
+   a. Поменяйте в файле ```integrations.global.php``` host
 
 #
 
-5. Выполните миграции из контейнера ```application-backend```:
+5. Запустите систему:
 
+   a. Сборка Docker-образа на основе ```Dockerfile``` и файлов из текущей папки
+   ```bash
+     docker build -t application-backend .
+   ```
 
-- Открываем shell-сессию внутри контейнера
-> ```bash
-> docker exec -it application-backend sh
-> ```
-
-- Выполняем миграции
-> ```bash
-> vendor/bin/phpmig migrate
-> ```
-
-- При необходимости можете откатить все миграции
-> ```bash
-> vendor/bin/phpmig phpmig rollback -t 0
-> ```
+   b. Поднимаеv все сервисы из ```docker-compose.yml``` и запускает их в фоне
+   ```bash
+     docker-compose up -d
+   ```
 
 #
 
-6. Запустите воркеры из контейнера ```application-backend```:
+6. Выполните миграции из контейнера ```application-backend```:
 
-- Запуска воркера для вебхуков из API чатов amoCRM ```AmoJoQueueWorker```
-> ```bash
-> php console.php app:amojo:sync-message
-> ```
+   a. Открываем shell-сессию внутри контейнера
+   ```bash
+     docker exec -it application-backend sh
+   ```
 
-- Запуска воркера для вебхуков из Telegram ```TelegramQueueWorker```
-> ```bash
-> php console.php app:telegram:sync-message
-> ```
+   b. Выполняем миграции
+   ```bash
+     vendor/bin/phpmig migrate
+   ```
+
+   c. При необходимости можете откатить все миграции
+   ```bash
+     vendor/bin/phpmig phpmig rollback -t 0
+   ```
+
+#
+
+7. Запустите воркеры из контейнера ```application-backend```:
+
+   a. Запуска воркера для вебхуков из API чатов amoCRM ```AmoJoQueueWorker```
+   ```bash
+     php console.php app:amojo:sync-message
+   ```
+
+   b. Запуска воркера для вебхуков из Telegram ```TelegramQueueWorker```
+   ```bash
+     php console.php app:telegram:sync-message
+   ```
 
 ___
 
 ## Настройка интеграций
 #### Для amoCRM:
 
-1. Создайте приватную/публичную(требуется тех.аккаунт) интеграцию в amoCRM amoМаркет
+1. Создайте приватную/публичную(требуется тех.аккаунт) интеграцию в <a href="https://www.amocrm.ru/developers/content/oauth/step-by-step">amoCRM amoМаркет</a>
 
     - Укажите redirect_uri: ```https://ваш-домен/api/amocrm/installing-integration```
     - Множественные источники: поддерживает
     - <a href="https://github.com/fcritic/amocrm-telegram-bot/tree/master/widget">Загрузите виджет</a>
-    - <a href="https://www.amocrm.ru/developers/content/oauth/step-by-step">Пример OAuth 2.0 по шагам</a>
 
-3. Зарегистрируйте канал чатов с технической поддержки amoCRM
+3. Зарегистрируйте канал чатов в технической поддержки amoCRM
 
-    - Укажите Webhook URL ```https://ваш-домен/api/amocrm/webhook/amojo/{scope_id}```
+    - Укажите Webhook URL ```https://ваш-домен/api/amocrm/webhook/amojo/:scope_id```
     - <a href="https://www.amocrm.ru/developers/content/chats/chat-start">Начало работы c API чатов amoCRM</a>
 
 #
 
 #### Для Telegram:
-Создайте бота через @BotFather
+Создайте бота через @BotFather и получите токен который укажите в карточки интеграции при загрузки виджета
 
 ___
 
