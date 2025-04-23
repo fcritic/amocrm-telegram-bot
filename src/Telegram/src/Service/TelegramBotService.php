@@ -8,10 +8,10 @@ use AmoCRM\Repository\AccountRepository;
 use AmoCRM\Repository\Interface\AccountRepositoryInterface;
 use AmoJo\Enum\MessageType;
 use AmoJo\Enum\WebHookType;
-use AmoJo\Webhook\AbstractWebHookEvent;
-use AmoJo\Webhook\OutgoingMessageEvent;
-use AmoJo\Webhook\ReactionEvent;
-use AmoJo\Webhook\TypingEvent;
+use AmoJo\Webhook\DTO\DtoInterface;
+use AmoJo\Webhook\DTO\OutgoingMessageEvent;
+use AmoJo\Webhook\DTO\ReactionEvent;
+use AmoJo\Webhook\DTO\TypingEvent;
 use App\Exception\NotFountTokenException;
 use Dot\DependencyInjection\Attribute\Inject;
 use Exception;
@@ -122,12 +122,12 @@ class TelegramBotService
      * - Определяет тип события (сообщение/реакция/индикатор)
      * - Перенаправляет обработку в соответствующий метод
      *
-     * @param AbstractWebHookEvent $event Событие для отправки
+     * @param DtoInterface $event Событие для отправки
      * @return Message|null Объект сообщения (для текстовых/медиа-сообщений)
      * @throws NotFountTokenException Если токен бота не найден
      * @throws Exception
      */
-    public function sendEventTelegram(AbstractWebHookEvent $event): Message|null
+    public function sendEventTelegram(DtoInterface $event): Message|null
     {
         $token = $this->accountRepo->getTelegramToken(amoJoId: $event->getAccountUid());
 

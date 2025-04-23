@@ -38,6 +38,8 @@ class MessageFactory extends BaseMessageFactory
     {
         $message = $update->message ?? $update->editedMessage ?? $update->messageReaction;
 
+        var_dump($this->buildMediaUrl($messageData));
+
         return array_filter([
             'message' => [
                 'type' => $messageData->getMessageType(),

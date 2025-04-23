@@ -2,7 +2,7 @@
 
 namespace Integration\DTO;
 
-use AmoJo\Webhook\OutgoingMessageEvent;
+use AmoJo\Webhook\DTO\OutgoingMessageEvent;
 use Integration\Enum\EventType;
 use Vjik\TelegramBot\Api\Type\Message;
 

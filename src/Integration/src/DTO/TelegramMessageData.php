@@ -187,8 +187,8 @@ readonly class TelegramMessageData implements MessageDataInterface
                 $message->voice !== null => MessageType::VOICE,
 
                 $message->sticker !== null,
-                    $message->videoNote !== null,
-                    $message->video !== null => MessageType::VIDEO, //!!!!!!!!!
+                $message->videoNote !== null,
+                $message->video !== null => MessageType::VIDEO, //!!!!!!!!!
 
                 $message->location !== null => MessageType::LOCATION,
                 $message->photo !== null => MessageType::PICTURE,
@@ -223,7 +223,8 @@ readonly class TelegramMessageData implements MessageDataInterface
                 ?? $message->videoNote?->fileId
                 ?? ($message->photo
                 ? (
-                    (isset($message->photo[2]) ? $message->photo[2]?->fileId : null)
+                    (isset($message->photo[3]) ? $message->photo[3]?->fileId : null)
+                    ?? (isset($message->photo[2]) ? $message->photo[2]?->fileId : null)
                     ?? (isset($message->photo[0]) ? $message->photo[0]?->fileId : null)
                 )
                 : null)
