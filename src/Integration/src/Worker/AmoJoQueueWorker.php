@@ -7,7 +7,7 @@ namespace Integration\Worker;
 use AmoCRM\Service\AmoJoClientService;
 use AmoJo\Enum\DeliveryStatus;
 use AmoJo\Enum\ErrorCode;
-use AmoJo\Webhook\OutgoingMessageEvent;
+use AmoJo\Webhook\DTO\OutgoingMessageEvent;
 use AmoJo\Webhook\ParserWebHooks;
 use App\BeanstalkConfig;
 use App\Worker\AbstractWorker;
