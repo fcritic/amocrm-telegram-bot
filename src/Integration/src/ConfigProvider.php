@@ -45,8 +45,7 @@ class ConfigProvider
                 },
                 TelegramQueueWorkerCommand::class => static function (ContainerInterface $container) {
                     return new TelegramQueueWorkerCommand($container);
-                },
-                InstallingWidgetHandler::class => AttributedServiceFactory::class,
+                }
             ],
             'console' => [
                 'commands' => [
