@@ -104,7 +104,7 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
      * @param int $amoAccountId
      * @return Account|null
      */
-    public function getAccountAndTokens(int $amoAccountId): ?Account
+    public function getAccountWithTokens(int $amoAccountId): ?Account
     {
         /** @var Account */
         return $this->query()
@@ -134,5 +134,35 @@ class AccountRepository extends AbstractRepository implements AccountRepositoryI
             })
             ->with('accessToken')
             ->chunk(self::CHUNK_SIZE, $callback);
+    }
+
+    /**
+     * Получения тг токена бота по id аккаунта amoCRM
+     *
+     * @param int $amoAccountId
+     * @return string
+     */
+    public function getTgToken(int $amoAccountId): string
+    {
+        /** @var $account Account */
+        $account = $this->query()
+            ->with('TelegramConnection')
+            ->where('amo_account_id', $amoAccountId)
+            ->first();
+
+        return $account?->getAttribute('TelegramConnection')->first()->token_bot;
+    }
+
+    /**
+     * Удаляет все данные об аккаунте при отключении интеграции
+     *
+     * @param int $amoAccountId
+     * @return void
+     */
+    public function deleteAccount(int $amoAccountId): void
+    {
+        $this->query()
+            ->where('amo_account_id', $amoAccountId)
+            ->delete();
     }
 }

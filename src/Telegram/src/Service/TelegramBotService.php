@@ -91,6 +91,25 @@ class TelegramBotService
     }
 
     /**
+     * Отключения вебхука в тг боте
+     *
+     * @param string $token
+     * @return bool
+     * @throws Exception
+     */
+    public function deleteWebhook(string $token): bool
+    {
+        $telegramBot = $this->factoryBotApi->make($token);
+
+        $result = $telegramBot->deleteWebhook();
+
+        return match (true) {
+            $result instanceof FailResult => false,
+            default => true,
+        };
+    }
+
+    /**
      * Генерирует уникальный секретный токен на основе токена бота.
      * Используется для верификации входящих вебхуков.
      *

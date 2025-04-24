@@ -17,7 +17,11 @@ interface AccountRepositoryInterface
 
     public function getFieldsId(string $subDomain): array;
 
-    public function getAccountAndTokens(int $amoAccountId): ?Account;
+    public function getAccountWithTokens(int $amoAccountId): ?Account;
 
     public function getAllAccountsWithTokens(int $day, Closure $callback): void;
+
+    public function getTgToken(int $amoAccountId): string;
+
+    public function deleteAccount(int $amoAccountId): void;
 }
