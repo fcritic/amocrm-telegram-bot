@@ -147,7 +147,7 @@ readonly class OAuthService implements OAuthServiceInterface
      */
     public function getClient(int $accountId): AmoCRMApiClient
     {
-        $query = $this->accountRepo->getAccountAndTokens($accountId);
+        $query = $this->accountRepo->getAccountWithTokens($accountId);
 
         $accessToken = $query?->getAttribute('accessToken')->first();
 
