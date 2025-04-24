@@ -13,6 +13,7 @@ use AmoCRM\Repository\AccessTokenRepository;
 use AmoCRM\Repository\AccountRepository;
 use AmoCRM\Repository\Interface\AccessTokenRepositoryInterface;
 use AmoCRM\Repository\Interface\AccountRepositoryInterface;
+use AmoCRM\Service\AmoCrmClientService;
 use AmoJo\Client\AmoJoClient;
 use AmoJo\Webhook\ParserWebHooks;
 use Dot\DependencyInjection\Factory\AttributedServiceFactory;
@@ -49,6 +50,7 @@ class ConfigProvider
                 MessageFactory::class => AttributedServiceFactory::class,
                 SenderFactory::class => AttributedServiceFactory::class,
                 AmoJoConfig::class => AttributedServiceFactory::class,
+                AmoCrmClientService::class => AttributedServiceFactory::class
             ],
         ];
     }
